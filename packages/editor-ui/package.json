@@ -1,0 +1,25 @@
+{
+  "name": "@tezmind/editor-ui",
+  "version": "0.1.0",
+  "description": "TezMind editor UI — canvas, layers, inspector, prompt bar. React Native + react-native-web. Takes HostBridge as a prop.",
+  "main": "./index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@tezmind/core": "workspace:*",
+    "react": "18.3.1",
+    "react-native": "0.76.5",
+    "zustand": "^5.0.2",
+    "immer": "^10.1.1"
+  },
+  "peerDependencies": {
+    "react": "^18",
+    "react-native": "^0.76"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  },
+  "license": "MIT"
+}

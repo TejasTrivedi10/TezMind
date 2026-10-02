@@ -1,0 +1,66 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2022,
+    "sourceType": "module",
+    "ecmaFeatures": { "jsx": true }
+  },
+  "plugins": ["@typescript-eslint", "import"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "import/no-cycle": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "packages/core/**/*.ts",
+        "packages/ai/**/*.ts",
+        "packages/codegen-flutter/**/*.ts",
+        "packages/codegen-rn/**/*.ts",
+        "packages/figma/**/*.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["react", "react-native", "react-native-*", "expo", "expo-*"],
+                "message": "Core packages must be host-agnostic. No React/RN/Expo imports allowed."
+              },
+              {
+                "group": ["fs", "path", "os", "crypto"],
+                "message": "Core packages must be host-agnostic. Use HostBridge interfaces instead of Node built-ins."
+              }
+            ],
+            "paths": [
+              {
+                "name": "react",
+                "message": "Core packages must be host-agnostic. No React imports allowed."
+              },
+              {
+                "name": "react-native",
+                "message": "Core packages must be host-agnostic. No React Native imports allowed."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "node_modules/",
+    "dist/",
+    ".expo/",
+    "web-build/",
+    "**/*.js"
+  ]
+}

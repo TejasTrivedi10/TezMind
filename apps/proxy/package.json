@@ -1,0 +1,15 @@
+{
+  "name": "@tezmind/proxy",
+  "version": "0.1.0",
+  "description": "TezMind local CORS proxy — 127.0.0.1 only, forwards to allowed AI provider hosts.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node server/proxy.mjs",
+    "dev": "node server/proxy.mjs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

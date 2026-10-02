@@ -1,0 +1,29 @@
+node_modules/
+.expo/
+dist/
+web-build/
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local
+*.pem
+
+# pnpm
+.pnpm-store/
+
+# build outputs
+packages/*/dist/
+apps/*/dist/
+apps/*/build/
+
+# coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+Thumbs.db

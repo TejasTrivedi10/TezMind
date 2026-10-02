@@ -1,0 +1,34 @@
+{
+  "name": "tezmind-root",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TezMind — Open-source AI UI design tool. Bring your own key.",
+  "license": "MIT",
+  "scripts": {
+    "dev": "pnpm --filter @tezmind/web dev",
+    "build": "pnpm --filter @tezmind/web build:web",
+    "build:web": "pnpm --filter @tezmind/web build:web",
+    "serve": "pnpm --filter @tezmind/web serve",
+    "proxy": "pnpm --filter @tezmind/proxy start",
+    "dev:all": "pnpm --parallel --filter @tezmind/web --filter @tezmind/proxy dev",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:ci": "pnpm -r test --ci",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,md}\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}

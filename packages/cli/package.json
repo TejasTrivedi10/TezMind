@@ -1,0 +1,25 @@
+{
+  "name": "@tezmind/cli",
+  "version": "0.1.0",
+  "description": "TezMind CLI — export projects to Flutter/RN without the UI.",
+  "bin": {
+    "tezmind": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "ts-node src/cli.ts"
+  },
+  "dependencies": {
+    "@tezmind/core": "workspace:*",
+    "@tezmind/codegen-flutter": "workspace:*",
+    "@tezmind/codegen-rn": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "ts-node": "^10.9.2",
+    "@types/node": "^22.0.0"
+  },
+  "license": "MIT"
+}
