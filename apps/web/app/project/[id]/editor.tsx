@@ -7,11 +7,16 @@ import { View, Text, Pressable, StyleSheet, ActivityIndicator, TextInput, Image,
 import { useLocalSearchParams, router } from 'expo-router';
 import { colors, typography, spacing, radii } from '../../../design/tokens';
 import { useProjectStore } from '../../../store/useProjectStore';
-import { getDatabase } from '../../../host/database';
+import { getDatabase, type ScreenAssetRow } from '../../../host/database';
 import { getSecretStorage } from '../../../host/secrets';
 import { getHttpBridge } from '../../../host/http';
 import { GoogleProvider, AnthropicProvider, FALLBACK_MODELS, type GenerateRequest, type ModelInfo } from '@tezmind/ai';
 import type { ProjectMeta, ScreenRecord } from '@tezmind/core';
+import { dslToHtml, htmlToDsl } from '@tezmind/core';
+import { HtmlPreview } from '../../../components/HtmlPreview';
+import { IdeCodeEditor } from '../../../components/IdeCodeEditor';
+
+type CodeFileTab = 'html' | 'css' | 'js';
 
 type ProviderKey = 'google' | 'anthropic';
 
@@ -32,12 +37,24 @@ export default function EditorScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getProject, loadProjects, updateProject } = useProjectStore();
   const [project, setProject] = useState<ProjectMeta | undefined>(undefined);
+  const [screensList, setScreensList] = useState<ScreenRecord[]>([]);
   const [screen, setScreen] = useState<ScreenRecord | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   // Dynamic model list
   const [availableModels, setAvailableModels] = useState<ModelOption[]>(STATIC_FALLBACK_MODELS);
   const [modelsLoading, setModelsLoading] = useState(false);
+
+  // Streaming HTML & selection & live code editor
+  const [streamingHtml, setStreamingHtml] = useState<string>('');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [codeEditorHtml, setCodeEditorHtml] = useState<string>('');
+  const [copiedCodeNotice, setCopiedCodeNotice] = useState<boolean>(false);
+
+  // Multi-file code editor (HTML | CSS | JS)
+  const [activeCodeFile, setActiveCodeFile] = useState<CodeFileTab>('html');
+  const [cssContent, setCssContent] = useState<string>('/* Screen styles */\n\nbody {\n  font-family: system-ui, sans-serif;\n  margin: 0;\n}\n');
+  const [jsContent, setJsContent] = useState<string>('// Screen scripts\n\nconsole.log(\'TezMind screen loaded\');\n');
 
   // Initial prompt & reference image
   const [promptInput, setPromptInput] = useState('');
@@ -92,8 +109,9 @@ export default function EditorScreen() {
 
       if (p) {
         const db = getDatabase();
-        // Load initial screen
+        // Load screens
         const screens = await db.screens.where('projectId').equals(p.id).toArray();
+        setScreensList(screens);
         if (screens.length > 0) {
           setScreen(screens[0]);
         }
@@ -115,7 +133,6 @@ export default function EditorScreen() {
         if (token) {
           loadModels(defaultProvider, token);
         } else {
-          // Use fallback models for the default provider
           const fallback = (FALLBACK_MODELS[defaultProvider] ?? []).map((m): ModelOption => ({
             id: m.id,
             name: m.name,
@@ -128,6 +145,156 @@ export default function EditorScreen() {
       setIsLoading(false);
     })();
   }, [id, loadProjects, getProject, loadModels]);
+
+  // Keep code editor HTML in sync with current active screen; also load CSS/JS assets
+  useEffect(() => {
+    if (!screen) return;
+    // Sync HTML
+    if (screen.rootJson) {
+      try {
+        const root = JSON.parse(screen.rootJson);
+        const html = dslToHtml({
+          id: screen.id,
+          name: screen.name,
+          width: screen.width,
+          height: screen.height,
+          schemaVersion: 1,
+          root,
+        });
+        setCodeEditorHtml(html);
+      } catch { /* skip */ }
+    }
+    // Load CSS/JS assets from DB
+    (async () => {
+      const db = getDatabase();
+      const cssRow = await db.screenAssets.get(`${screen.id}::styles.css`);
+      if (cssRow) setCssContent(cssRow.content);
+      const jsRow = await db.screenAssets.get(`${screen.id}::app.js`);
+      if (jsRow) setJsContent(jsRow.content);
+    })();
+  }, [screen?.id]);
+
+  const handleAddScreen = async () => {
+    if (!project) return;
+    const db = getDatabase();
+    const nextNum = screensList.length + 1;
+    const screenName = `Screen ${nextNum}`;
+    const width = screen?.width || 393;
+    const height = screen?.height || 852;
+
+    const defaultRootNode = {
+      id: 'root',
+      type: 'frame',
+      name: `${screenName} Root`,
+      props: {},
+      style: { backgroundColor: '#0F172A' },
+      sizing: { width: { mode: 'fixed', value: width }, height: { mode: 'fixed', value: height } },
+      layout: { direction: 'column', gap: 16, padding: { top: 24, right: 16, bottom: 24, left: 16 }, mainAxis: 'start', crossAxis: 'stretch' },
+      children: [
+        {
+          id: `title_${Date.now()}`,
+          type: 'text',
+          name: 'Screen Title',
+          props: { content: screenName },
+          style: { fontSize: 24, fontWeight: '700', color: '#F8FAFC' },
+          sizing: { width: { mode: 'hug' }, height: { mode: 'hug' } },
+        },
+        {
+          id: `subtitle_${Date.now()}`,
+          type: 'text',
+          name: 'Screen Subtitle',
+          props: { content: 'Use prompt to generate UI for this screen' },
+          style: { fontSize: 14, fontWeight: '400', color: '#94A3B8' },
+          sizing: { width: { mode: 'hug' }, height: { mode: 'hug' } },
+        },
+      ],
+    };
+
+    const newScreenRecord: ScreenRecord = {
+      id: `screen_${Date.now()}`,
+      name: screenName,
+      order: nextNum,
+      width,
+      height,
+      schemaVersion: 1,
+      rootJson: JSON.stringify(defaultRootNode),
+      updatedAt: Date.now(),
+    };
+
+    await db.screens.put({ ...newScreenRecord, projectId: project.id });
+    setScreensList((prev) => [...prev, newScreenRecord]);
+    setScreen(newScreenRecord);
+  };
+
+  const handleCodeEditorChange = async (newHtml: string) => {
+    setCodeEditorHtml(newHtml);
+    if (!project || !screen) return;
+
+    const { screens } = htmlToDsl(newHtml, {
+      width: screen.width,
+      height: screen.height,
+      projectName: project.name,
+    });
+
+    if (screens && screens.length > 0) {
+      const updatedScreenRecord: ScreenRecord = {
+        ...screen,
+        rootJson: JSON.stringify(screens[0].root),
+        updatedAt: Date.now(),
+      };
+      setScreen(updatedScreenRecord);
+      setScreensList((prev) => prev.map((s) => (s.id === screen.id ? updatedScreenRecord : s)));
+      const db = getDatabase();
+      await db.screens.put({ ...updatedScreenRecord, projectId: project.id });
+    }
+  };
+
+  const handleCssChange = async (newCss: string) => {
+    setCssContent(newCss);
+    if (!project || !screen) return;
+    const db = getDatabase();
+    const row: ScreenAssetRow = {
+      id: `${screen.id}::styles.css`,
+      screenId: screen.id,
+      projectId: project.id,
+      filename: 'styles.css',
+      content: newCss,
+      updatedAt: Date.now(),
+    };
+    await db.screenAssets.put(row);
+  };
+
+  const handleJsChange = async (newJs: string) => {
+    setJsContent(newJs);
+    if (!project || !screen) return;
+    const db = getDatabase();
+    const row: ScreenAssetRow = {
+      id: `${screen.id}::app.js`,
+      screenId: screen.id,
+      projectId: project.id,
+      filename: 'app.js',
+      content: newJs,
+      updatedAt: Date.now(),
+    };
+    await db.screenAssets.put(row);
+  };
+
+  const handleCopyCode = () => {
+    const textToCopy = activeCodeFile === 'css' ? cssContent
+      : activeCodeFile === 'js' ? jsContent
+      : codeEditorHtml;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(textToCopy);
+      setCopiedCodeNotice(true);
+      setTimeout(() => setCopiedCodeNotice(false), 2000);
+    }
+  };
+
+  const handleFormat = () => {
+    // Trigger Monaco format via the iframe postMessage
+    const iframe = document.querySelector('iframe[title="TezMind Monaco Code Editor"]') as HTMLIFrameElement | null;
+    iframe?.contentWindow?.postMessage({ type: 'format' }, '*');
+  };
 
   const handleSelectModel = async (model: ModelOption) => {
     setSelectedModel(model);
@@ -217,9 +384,13 @@ export default function EditorScreen() {
         modelId,
       };
 
+      setStreamingHtml('');
+
       for await (const event of provider.generate(req, token, http, abortController.signal)) {
         if (event.type === 'progress') {
           setStatusMessage(event.message ?? null);
+        } else if (event.type === 'html_chunk') {
+          setStreamingHtml((prev) => prev + event.html);
         } else if (event.type === 'screens' && event.screens && event.screens.length > 0) {
           const generatedScreen = event.screens[0];
           if (screen) {
@@ -314,7 +485,7 @@ export default function EditorScreen() {
           <View style={styles.devicePill}>
             <Text style={styles.devicePillText}>{project.device} ({dimensionsStr})</Text>
           </View>
-          <Pressable style={styles.exportHeaderBtn}>
+          <Pressable style={styles.exportHeaderBtn} onPress={() => setActiveTab('code')}>
             <Text style={styles.exportHeaderBtnText}>Export Code</Text>
           </Pressable>
         </View>
@@ -324,15 +495,28 @@ export default function EditorScreen() {
       <View style={styles.main}>
         {/* Left Screens Panel */}
         <View style={styles.screensStrip}>
-          <Text style={styles.panelTitle}>Screens</Text>
-          <View style={styles.screenThumbSelected}>
-            <View style={styles.screenMiniCard}>
-              <Text style={styles.screenThumbIcon}>📱</Text>
-            </View>
-            <Text style={styles.screenThumbLabel}>{screen?.name || 'Screen 1'}</Text>
-          </View>
+          <Text style={styles.panelTitle}>Screens ({screensList.length})</Text>
+          <ScrollView style={{ maxHeight: 220, marginVertical: spacing[2] }} showsVerticalScrollIndicator={false}>
+            {screensList.map((sc) => {
+              const isSelected = sc.id === screen?.id;
+              return (
+                <Pressable
+                  key={sc.id}
+                  style={[styles.screenThumbSelected, !isSelected && styles.screenThumbUnselected]}
+                  onPress={() => setScreen(sc)}
+                >
+                  <View style={styles.screenMiniCard}>
+                    <Text style={styles.screenThumbIcon}>📱</Text>
+                  </View>
+                  <Text style={[styles.screenThumbLabel, !isSelected && styles.screenThumbLabelUnselected]} numberOfLines={1}>
+                    {sc.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
 
-          <Pressable style={styles.addScreenBtn}>
+          <Pressable style={styles.addScreenBtn} onPress={handleAddScreen}>
             <Text style={styles.addScreenBtnText}>+ Add Screen</Text>
           </Pressable>
 
@@ -350,49 +534,191 @@ export default function EditorScreen() {
           )}
         </View>
 
-        {/* Center Canvas Area */}
-        <View style={styles.canvas}>
-          <ScrollView
-            contentContainerStyle={styles.canvasScrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {/* Screen Frame Mockup */}
-            <View style={styles.screenFrameContainer}>
-              <View style={styles.deviceMockHeader}>
-                <View style={styles.notchDot} />
-                <Text style={styles.deviceMockTitle}>{screen?.name || 'Screen 1'} — {dimensionsStr}</Text>
-                <View style={styles.statusIcons}>
-                  <Text style={styles.statusIconText}>📶 🔋</Text>
+        {/* Center Canvas / Split View Area */}
+        {activeTab === 'code' ? (
+          <View style={styles.codeExportSplitContainer}>
+
+            {/* ── LEFT: Live Preview ─────────────────────────────────── */}
+            <View style={styles.codePreviewHalf}>
+              <View style={styles.previewHeader}>
+                <View style={styles.previewHeaderLeft}>
+                  <Text style={styles.previewHeaderTitle}>📱 Live Canvas</Text>
+                  <Text style={styles.previewHeaderSubtitle}>{screen?.name || 'Screen'} · {dimensionsStr}</Text>
+                </View>
+              </View>
+              <View style={styles.codePreviewCanvasBox}>
+                <HtmlPreview
+                  html={codeEditorHtml || streamingHtml}
+                  brandColor={project.brandColor}
+                  width={screen?.width || 393}
+                  height={screen?.height || 852}
+                  isStreaming={false}
+                  selectedNodeId={selectedNodeId}
+                  onSelectNode={(nodeId) => setSelectedNodeId(nodeId)}
+                />
+              </View>
+            </View>
+
+            {/* ── RIGHT: Monaco IDE Code Editor ──────────────────────── */}
+            <View style={styles.codeEditorHalf}>
+
+              {/* VS Code–style title bar */}
+              <View style={styles.ideTitleBar}>
+                <View style={styles.ideWindowDots}>
+                  <View style={[styles.windowDot, { backgroundColor: '#FF5F57' }]} />
+                  <View style={[styles.windowDot, { backgroundColor: '#FFBD2E' }]} />
+                  <View style={[styles.windowDot, { backgroundColor: '#28C840' }]} />
+                </View>
+
+                {/* File tabs */}
+                <View style={styles.ideTabRow}>
+                  {(['html', 'css', 'js'] as CodeFileTab[]).map((file) => {
+                    const labels: Record<CodeFileTab, string> = { html: '⟨⟩ index.html', css: '# styles.css', js: '⚡ app.js' };
+                    const isActive = activeCodeFile === file;
+                    return (
+                      <Pressable
+                        key={file}
+                        style={[styles.ideTab, isActive && styles.ideTabActive]}
+                        onPress={() => setActiveCodeFile(file)}
+                      >
+                        <Text style={[styles.ideTabText, isActive && styles.ideTabTextActive]}>
+                          {labels[file]}
+                        </Text>
+                        {isActive && <View style={styles.ideTabDot} />}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+
+                {/* Actions */}
+                <View style={styles.ideActions}>
+                  <Pressable style={styles.ideActionBtn} onPress={handleFormat}>
+                    <Text style={styles.ideActionBtnText}>⚙ Format</Text>
+                  </Pressable>
+                  <Pressable style={styles.ideActionBtn} onPress={handleCopyCode}>
+                    <Text style={styles.ideActionBtnText}>{copiedCodeNotice ? '✓ Copied' : '⎘ Copy'}</Text>
+                  </Pressable>
                 </View>
               </View>
 
-              {/* Inner Screen Display */}
-              <View style={styles.screenCanvasInner}>
-                {parsedRoot ? (
-                  <ScrollView style={{ flex: 1, width: '100%' }}>
-                    <NodeRenderer node={parsedRoot} brandColor={project.brandColor} />
-                  </ScrollView>
+              {/* Monaco editor body */}
+              <View style={styles.ideEditorBody}>
+                {Platform.OS === 'web' ? (
+                  activeCodeFile === 'html' ? (
+                    <IdeCodeEditor
+                      key="html"
+                      value={codeEditorHtml}
+                      onChange={handleCodeEditorChange}
+                      language="html"
+                    />
+                  ) : activeCodeFile === 'css' ? (
+                    <IdeCodeEditor
+                      key="css"
+                      value={cssContent}
+                      onChange={handleCssChange}
+                      language="css"
+                    />
+                  ) : (
+                    <IdeCodeEditor
+                      key="js"
+                      value={jsContent}
+                      onChange={handleJsChange}
+                      language="javascript"
+                    />
+                  )
                 ) : (
-                  <View style={styles.screenEmptyState}>
-                    <Text style={styles.emptyEmoji}>✨</Text>
-                    <Text style={styles.emptyTitle}>Ready to Build Screen</Text>
-                    <Text style={styles.emptySubtitle}>
-                      {promptInput
-                        ? `Target Prompt: "${promptInput}"`
-                        : 'Enter a prompt or select a reference image below to generate your UI.'}
-                    </Text>
-
-                    {attachedImage && (
-                      <View style={styles.imageRefBox}>
-                        <Text style={styles.imageRefLabel}>Attached Reference Image:</Text>
-                        <Image source={{ uri: attachedImage }} style={styles.imageRefThumb} resizeMode="contain" />
-                      </View>
-                    )}
-                  </View>
+                  <TextInput
+                    style={styles.codeEditorInput}
+                    multiline
+                    value={activeCodeFile === 'css' ? cssContent : activeCodeFile === 'js' ? jsContent : codeEditorHtml}
+                    onChangeText={activeCodeFile === 'css' ? handleCssChange : activeCodeFile === 'js' ? handleJsChange : handleCodeEditorChange}
+                    placeholder={activeCodeFile === 'css' ? '/* CSS here... */' : activeCodeFile === 'js' ? '// JS here...' : '<!-- HTML here... -->'}
+                    placeholderTextColor="#475569"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
                 )}
               </View>
+
+              {/* VS Code–style status bar */}
+              <View style={styles.ideStatusBar}>
+                <Text style={styles.ideStatusText}>
+                  {activeCodeFile === 'css' ? 'CSS' : activeCodeFile === 'js' ? 'JavaScript' : 'HTML'} · UTF-8 · LF
+                </Text>
+                <Text style={styles.ideStatusText}>
+                  Ln {(activeCodeFile === 'css' ? cssContent : activeCodeFile === 'js' ? jsContent : codeEditorHtml).split('\n').length}
+                </Text>
+                <Text style={styles.ideStatusText}>TezMind Editor</Text>
+              </View>
             </View>
-          </ScrollView>
+
+          </View>
+        ) : (
+          <View style={styles.canvas}>
+            <ScrollView
+              contentContainerStyle={styles.canvasScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              {/* Screen Frame Mockup */}
+              <View style={styles.screenFrameContainer}>
+                <View style={styles.deviceMockHeader}>
+                  <View style={styles.notchDot} />
+                  <Text style={styles.deviceMockTitle}>{screen?.name || 'Screen 1'} — {dimensionsStr}</Text>
+                  <View style={styles.statusIcons}>
+                    <Text style={styles.statusIconText}>📶 🔋</Text>
+                  </View>
+                </View>
+
+                {/* Inner Screen Display */}
+                <View style={styles.screenCanvasInner}>
+                  {isGenerating || streamingHtml ? (
+                    <HtmlPreview
+                      html={streamingHtml}
+                      brandColor={project.brandColor}
+                      width={screen?.width || 393}
+                      height={screen?.height || 852}
+                      isStreaming={isGenerating}
+                      selectedNodeId={selectedNodeId}
+                      onSelectNode={(id) => setSelectedNodeId(id)}
+                    />
+                  ) : parsedRoot ? (
+                    <HtmlPreview
+                      html={dslToHtml({
+                        id: screen?.id || 'screen_1',
+                        name: screen?.name || 'Main Screen',
+                        width: screen?.width || 393,
+                        height: screen?.height || 852,
+                        schemaVersion: 1,
+                        root: parsedRoot,
+                      })}
+                      brandColor={project.brandColor}
+                      width={screen?.width || 393}
+                      height={screen?.height || 852}
+                      isStreaming={false}
+                      selectedNodeId={selectedNodeId}
+                      onSelectNode={(id) => setSelectedNodeId(id)}
+                    />
+                  ) : (
+                    <View style={styles.screenEmptyState}>
+                      <Text style={styles.emptyEmoji}>✨</Text>
+                      <Text style={styles.emptyTitle}>Ready to Build Screen</Text>
+                      <Text style={styles.emptySubtitle}>
+                        {promptInput
+                          ? `Target Prompt: "${promptInput}"`
+                          : 'Enter a prompt or select a reference image below to generate your UI.'}
+                      </Text>
+
+                      {attachedImage && (
+                        <View style={styles.imageRefBox}>
+                          <Text style={styles.imageRefLabel}>Attached Reference Image:</Text>
+                          <Image source={{ uri: attachedImage }} style={styles.imageRefThumb} resizeMode="contain" />
+                        </View>
+                      )}
+                    </View>
+                  )}
+                </View>
+              </View>
+            </ScrollView>
 
           {/* Model Selector Popover Modal (Matching Screenshot) */}
           {isModelPickerOpen && (
@@ -521,6 +847,7 @@ export default function EditorScreen() {
             </View>
           </View>
         </View>
+      )}
 
         {/* Right Inspector Panel */}
         <View style={styles.inspector}>
@@ -718,21 +1045,94 @@ const styles = StyleSheet.create({
   screenThumbSelected: {
     padding: spacing[2.5], borderRadius: radii.xl,
     backgroundColor: colors.primaryMuted, borderWidth: 1.5, borderColor: colors.primary,
-    flexDirection: 'row', alignItems: 'center', gap: spacing[3],
+    flexDirection: 'row', alignItems: 'center', gap: spacing[3], marginBottom: spacing[2],
+  },
+  screenThumbUnselected: {
+    backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
   },
   screenMiniCard: { width: 28, height: 36, borderRadius: radii.sm, backgroundColor: colors.bgCard, alignItems: 'center', justifyContent: 'center' },
   screenThumbIcon: { fontSize: 16 },
-  screenThumbLabel: { fontSize: typography.fontSize.sm, fontWeight: typography.fontWeight.semibold, color: colors.text },
+  screenThumbLabel: { fontSize: typography.fontSize.sm, fontWeight: typography.fontWeight.semibold, color: colors.text, flex: 1 },
+  screenThumbLabelUnselected: { color: colors.textSecondary, fontWeight: typography.fontWeight.regular },
   addScreenBtn: {
     paddingVertical: spacing[2.5], borderRadius: radii.lg,
     backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border,
-    alignItems: 'center',
+    alignItems: 'center', marginTop: spacing[1],
   },
   addScreenBtnText: { fontSize: typography.fontSize.xs, color: colors.textSecondary, fontWeight: typography.fontWeight.medium },
   stylesSection: { marginTop: spacing[4], gap: spacing[2] },
   tagsContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
   styleBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radii.full, backgroundColor: colors.surface },
   styleBadgeText: { fontSize: 10, color: colors.textSecondary },
+
+  // ── Split Code / IDE Layout ───────────────────────────────────────────────
+  codeExportSplitContainer: { flex: 1, flexDirection: 'row', backgroundColor: '#0D1117' },
+
+  // LEFT — live preview panel
+  codePreviewHalf: {
+    width: '40%', backgroundColor: '#0D1117', flexDirection: 'column',
+    borderRightWidth: 1, borderRightColor: '#21262D',
+    padding: spacing[3], gap: spacing[2],
+  },
+  previewHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingBottom: spacing[2], borderBottomWidth: 1, borderBottomColor: '#21262D',
+  },
+  previewHeaderLeft: { gap: 2 },
+  previewHeaderTitle: { fontSize: typography.fontSize.sm, fontWeight: typography.fontWeight.bold, color: '#C9D1D9' },
+  previewHeaderSubtitle: { fontSize: 11, color: '#8B949E' },
+  codePreviewCanvasBox: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+
+  // RIGHT — Monaco IDE panel
+  codeEditorHalf: {
+    width: '60%', backgroundColor: '#0D1117', flexDirection: 'column',
+    borderLeftWidth: 1, borderLeftColor: '#21262D',
+  },
+
+  // IDE title bar
+  ideTitleBar: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#161B22', borderBottomWidth: 1, borderBottomColor: '#21262D',
+    paddingLeft: spacing[3], height: 40, gap: spacing[2],
+  },
+  ideWindowDots: { flexDirection: 'row', gap: 6, alignItems: 'center' },
+  windowDot: { width: 12, height: 12, borderRadius: 6 },
+  // File tabs
+  ideTabRow: { flex: 1, flexDirection: 'row', alignItems: 'stretch' },
+  ideTab: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing[1.5],
+    paddingHorizontal: spacing[3], height: 40,
+    backgroundColor: '#161B22',
+    borderRightWidth: 1, borderRightColor: '#21262D',
+    borderTopWidth: 2, borderTopColor: 'transparent',
+  },
+  ideTabActive: {
+    backgroundColor: '#0D1117', borderTopColor: '#0078D4',
+  },
+  ideTabText: { fontSize: 12, color: '#8B949E', fontWeight: '400', fontFamily: Platform.OS === 'web' ? 'monospace' : undefined },
+  ideTabTextActive: { color: '#C9D1D9', fontWeight: '500' },
+  ideTabDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#0078D4' },
+  // Actions
+  ideActions: { flexDirection: 'row', gap: spacing[1.5], paddingHorizontal: spacing[2] },
+  ideActionBtn: {
+    paddingHorizontal: spacing[2.5], paddingVertical: spacing[1],
+    borderRadius: radii.sm, backgroundColor: '#21262D',
+    borderWidth: 1, borderColor: '#30363D',
+  },
+  ideActionBtnText: { fontSize: 11, color: '#8B949E', fontWeight: '500' },
+  // Editor body
+  ideEditorBody: { flex: 1, overflow: 'hidden' },
+  codeEditorInput: {
+    flex: 1, backgroundColor: '#0D1117', color: '#C9D1D9',
+    fontFamily: Platform.OS === 'web' ? 'monospace, Consolas, Courier' : 'monospace',
+    fontSize: 13, lineHeight: 22, padding: spacing[3], textAlignVertical: 'top',
+  },
+  // Status bar (VS Code blue bar at the bottom)
+  ideStatusBar: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: '#0078D4', paddingHorizontal: spacing[3], height: 22, gap: spacing[4],
+  },
+  ideStatusText: { fontSize: 11, color: '#FFFFFF', fontFamily: Platform.OS === 'web' ? 'monospace' : undefined },
 
   // Center Canvas
   canvas: { flex: 1, backgroundColor: colors.canvasBg, position: 'relative' },

@@ -63,6 +63,7 @@ export interface GenerateRequest {
 
 export type GenerateEvent =
   | { type: 'progress'; stage: 'analyzing' | 'planning' | 'generating' | 'validating'; message?: string }
+  | { type: 'html_chunk'; html: string }
   | { type: 'screens'; screens: Screen[] }
   | { type: 'patch'; patch: Patch }
   | { type: 'usage'; inputTokens: number; outputTokens: number; cost?: number }

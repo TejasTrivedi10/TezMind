@@ -9,8 +9,13 @@ export type { AIProvider, AIProviderRegistry, ModelInfo, GenerateRequest, Genera
 export { AnthropicProvider } from './providers/anthropic';
 export { GoogleProvider, resolveGoogleModelId } from './providers/google';
 
+// Model discovery & testing
+export { discoverGoogleModels, categorizeModels, testGoogleModelKey, parseModelVersionAndTier } from './models/registry';
+export type { ModelCategoryGroup, ModelTestResult } from './models/registry';
+
 // Prompts
 export { buildScreenGenPrompt, buildImageToDesignPrompt, buildEditByPromptPrompt, buildValidationRetryPrompt, DSL_SCHEMA_SUMMARY, DSL_EXAMPLE_COMPACT } from './prompts/v1';
+export { buildHtmlSystemPrompt, buildHtmlUserPrompt } from './prompts/html';
 export type { ScreenGenParams, ImageToDesignParams, EditByPromptParams } from './prompts/v1';
 
 // Validation

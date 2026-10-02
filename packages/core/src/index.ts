@@ -120,3 +120,10 @@ export type { Migration, Migratable } from './migrations';
 
 // ID generation
 export { nanoid } from './id';
+
+// HTML Subset & Converter
+export { ALLOWED_TAGS, ALLOWED_ATTRIBUTES, ALLOWED_STYLE_PROPERTIES, getDslNodeType } from './html/subset';
+export { RESET_STYLESHEET, generateTokenCssVariables } from './html/resetCss';
+export { htmlToDsl, dslToHtml, parseInlineStyle } from './html/converter';
+export type { HtmlToDslResult } from './html/converter';
+
