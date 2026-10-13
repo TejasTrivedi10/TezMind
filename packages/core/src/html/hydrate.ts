@@ -175,11 +175,11 @@ export function hydrate(
     if (w && h) {
       el.style.aspectRatio = `${w} / ${h}`;
     }
-    const imageUrl = safeUnsplashImageUrl(el.dataset.imageUrl ?? '');
+    const imageUrl = safeImageUrl(el.dataset.imageUrl ?? '');
     if (imageUrl) {
       el.style.background = `center / cover no-repeat url("${imageUrl}")`;
       el.replaceChildren();
-      const creditUrl = safeUnsplashLink(el.dataset.imageCreditUrl ?? '');
+      const creditUrl = safeImageLink(el.dataset.imageCreditUrl ?? '');
       if (creditUrl) {
         const credit = el.ownerDocument.createElement('a');
         credit.className = 'img-credit';
@@ -187,9 +187,9 @@ export function hydrate(
         credit.href = creditUrl;
         credit.target = '_blank';
         credit.rel = 'noopener noreferrer';
-        const photographer = (el.dataset.imageCredit ?? 'Unsplash photographer').slice(0, 80);
-        credit.setAttribute('aria-label', `Photo by ${photographer} on Unsplash`);
-        credit.textContent = `Photo by ${photographer} · Unsplash`;
+        const photographer = (el.dataset.imageCredit ?? 'Google Images').slice(0, 80);
+        credit.setAttribute('aria-label', `Photo via ${photographer}`);
+        credit.textContent = `Photo · ${photographer}`;
         el.appendChild(credit);
       }
     } else {
@@ -223,19 +223,22 @@ export function hydrate(
   });
 }
 
-function safeUnsplashImageUrl(value: string): string | null {
+function safeImageUrl(value: string): string | null {
   try {
+    if (!value) return null;
+    if (value.startsWith('data:image/')) return value;
     const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname === 'images.unsplash.com' ? url.href : null;
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
   } catch {
     return null;
   }
 }
 
-function safeUnsplashLink(value: string): string | null {
+function safeImageLink(value: string): string | null {
   try {
+    if (!value) return null;
     const url = new URL(value);
-    return url.protocol === 'https:' && /(^|\.)unsplash\.com$/i.test(url.hostname) ? url.href : null;
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
   } catch {
     return null;
   }

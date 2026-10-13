@@ -11,7 +11,7 @@
     "build:web": "pnpm --filter @tezmind/web build:web",
     "serve": "pnpm --filter @tezmind/web serve",
     "proxy": "pnpm --filter @tezmind/proxy start",
-    "images:dev": "python -m image_search",
+    "images:dev": "python -c \"import sys; sys.path.insert(0, 'python'); from google_images_scraper.__main__ import main; main()\"",
     "dev:all": "pnpm --parallel --filter @tezmind/web --filter @tezmind/proxy dev",
     "lint": "eslint . --ext .ts,.tsx --max-warnings 0",
     "typecheck": "pnpm -r typecheck",

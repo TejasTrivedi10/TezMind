@@ -69,13 +69,12 @@ TezMind never contacts any AI provider on your behalf. You supply your own API k
 
 ### Generated image assets
 
-When a generated screen contains image placeholders (`.img[data-img]`), the preview can search Unsplash using the image's descriptive alt text and display the first suitable result. Image discovery is optional: without the Python service or an Unsplash key, TezMind keeps its local gradient placeholders. The service keeps the Unsplash key off the browser and includes photographer attribution with each returned image.
+When a generated screen contains image placeholders (`.img[data-img]`), the preview can search Google Images using the image's descriptive alt text or topic via `google_images_scraper` and display the first suitable result. Image discovery is optional: without the Python service running, TezMind keeps its local gradient placeholders.
 
-1. Register an Unsplash API application and copy its access key into `UNSPLASH_ACCESS_KEY` in `.env`.
-2. Install the service dependencies with `python -m pip install -r python/requirements.txt`.
-3. Start the service with `pnpm images:dev` alongside `pnpm dev`.
+1. Install the service dependencies with `python -m pip install -r python/requirements.txt`.
+2. Start the service with `pnpm images:dev` alongside `pnpm dev`.
 
-Set `EXPO_PUBLIC_IMAGE_SEARCH_URL` when the service runs on a different address. Unsplash API usage requires hotlinked image URLs and visible photographer attribution; TezMind follows those requirements in the preview.
+Set `EXPO_PUBLIC_IMAGE_SEARCH_URL` when the service runs on a different address (defaults to `http://127.0.0.1:8000`).
 
 TezMind uses a **pnpm monorepo** with strict package boundaries:
 
@@ -118,6 +117,7 @@ See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for full details.
 ## 📖 Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — System design
+- [`docs/UI_GENERATION_FLOW.md`](docs/UI_GENERATION_FLOW.md) — End-to-end UI generation pipeline & asset discovery
 - [`docs/DSL.md`](docs/DSL.md) — TezDSL design tree reference
 - [`docs/DECISIONS.md`](docs/DECISIONS.md) — Recorded architecture decisions
 - [`docs/CODEGEN_MAPPING.md`](docs/CODEGEN_MAPPING.md) — Auto Layout → Flutter/RN mapping

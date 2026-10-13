@@ -51,10 +51,19 @@ async function searchImage(query: string, orientation: string): Promise<Searched
         searchCache.delete(key);
         return null;
       }
-      const imageUrl = new URL(result.image_url);
-      const creditUrl = new URL(result.photographer_url);
-      if (imageUrl.protocol !== 'https:' || imageUrl.hostname !== 'images.unsplash.com') return null;
-      if (creditUrl.protocol !== 'https:' || !/(^|\.)unsplash\.com$/i.test(creditUrl.hostname)) return null;
+      if (!result.image_url) {
+        searchCache.delete(key);
+        return null;
+      }
+      try {
+        if (!result.image_url.startsWith('data:image/')) {
+          const imageUrl = new URL(result.image_url);
+          if (imageUrl.protocol !== 'https:' && imageUrl.protocol !== 'http:') return null;
+        }
+      } catch {
+        searchCache.delete(key);
+        return null;
+      }
       return result;
     })
     .catch(() => {
@@ -68,23 +77,23 @@ async function searchImage(query: string, orientation: string): Promise<Searched
 
 function showImage(element: HTMLElement, result: SearchedImage): void {
   element.dataset.imageUrl = result.image_url;
-  element.dataset.imageCredit = result.photographer;
-  element.dataset.imageCreditUrl = result.photographer_url;
-  element.style.backgroundImage = `url("${result.image_url}")`;
-  element.style.backgroundPosition = 'center';
-  element.style.backgroundSize = 'cover';
+  element.dataset.imageCredit = result.photographer || 'Google Images';
+  element.dataset.imageCreditUrl = result.photographer_url || '';
+  element.style.background = `center / cover no-repeat url("${result.image_url}")`;
   element.setAttribute('aria-label', result.alt || element.dataset.alt || 'Photo');
   element.dataset.imageResolved = 'true';
+  element.dataset.h = '1';
   element.replaceChildren();
 
   const credit = element.ownerDocument.createElement('a');
   credit.className = 'img-credit';
   credit.dataset.imgCredit = 'true';
-  credit.href = result.photographer_url;
+  credit.href = result.photographer_url || '#';
   credit.target = '_blank';
   credit.rel = 'noopener noreferrer';
-  credit.setAttribute('aria-label', `Photo by ${result.photographer} on Unsplash`);
-  credit.textContent = `Photo by ${result.photographer} · Unsplash`;
+  const sourceName = result.photographer || 'Google Images';
+  credit.setAttribute('aria-label', `Photo via ${sourceName}`);
+  credit.textContent = `Photo · ${sourceName}`;
   element.appendChild(credit);
 }
 

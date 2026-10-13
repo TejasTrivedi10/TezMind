@@ -80,7 +80,7 @@ function sanitize(doc: Document) {
     }
     for (const a of Array.from(el.attributes)) {
       if (a.name === 'data-image-url' && isTrustedImageUrl(a.value)) continue;
-      if (a.name === 'data-image-credit-url' && isTrustedUnsplashLink(a.value)) continue;
+      if (a.name === 'data-image-credit-url' && isTrustedImageLink(a.value)) continue;
       if (/^on/i.test(a.name) || /javascript:|https?:\/\/|url\(|data:/i.test(a.value)) {
         el.removeAttribute(a.name);
       }
@@ -113,17 +113,18 @@ function sanitize(doc: Document) {
 
 function isTrustedImageUrl(value: string): boolean {
   try {
+    if (value.startsWith('data:image/')) return true;
     const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname === 'images.unsplash.com';
+    return url.protocol === 'https:' || url.protocol === 'http:';
   } catch {
     return false;
   }
 }
 
-function isTrustedUnsplashLink(value: string): boolean {
+function isTrustedImageLink(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' && /(^|\.)unsplash\.com$/i.test(url.hostname);
+    return url.protocol === 'https:' || url.protocol === 'http:';
   } catch {
     return false;
   }
