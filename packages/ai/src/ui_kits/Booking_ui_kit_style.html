@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Taxi Booking UI Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EFF1F5;--sf:#fff;--ink:#12141C;--mute:#666C7E;--line:#DADEE8;--y:#FFC61A;--yi:#1A1400;--ty:#FFF3C4;--in:#E8EBF2;--red:#E5393F;--grn:#14A44D;--map:#DFE5EE;--blue:#2F6BFF;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0C0D12;--sf:#171922;--ink:#F0F1F6;--mute:#9298AC;--line:#2A2D3B;--ty:#3A3010;--in:#212432;--map:#1B1F2B}}
+:root[data-theme="dark"]{--bg:#0C0D12;--sf:#171922;--ink:#F0F1F6;--mute:#9298AC;--line:#2A2D3B;--ty:#3A3010;--in:#212432;--map:#1B1F2B}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 Manrope,system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.02em;font-weight:800}
+.sub{color:var(--mute);margin:0 0 12px}
+h2{font-size:19px;margin:36px 0 4px;font-weight:800}
+.note{color:var(--mute);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.panel{background:var(--sf);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tag{font-size:12px;color:var(--mute);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.sp{justify-content:space-between}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.theme{float:right;border:1px solid var(--line);background:var(--sf);border-radius:99px;padding:8px 14px;font-size:13px}
+.meta{font-size:12px;color:var(--mute)}
+
+/* INPUTS */
+.field{display:flex;align-items:center;gap:10px;height:54px;border:1.5px solid var(--line);border-radius:14px;padding:0 14px;background:var(--sf);color:var(--mute)}
+.field:focus-within{border-color:var(--ink);box-shadow:0 0 0 3px var(--ty)}
+.field input,.field select{flex:1;min-width:0;border:0;background:none;font:inherit;color:var(--ink);outline:0}
+.field.err{border-color:var(--red)}
+.route{position:relative;background:var(--in);border-radius:18px;padding:6px 6px 6px 40px;display:flex;align-items:center;gap:6px}
+.route .col{flex:1;display:flex;flex-direction:column;min-width:0}
+.route input{height:44px;border:0;background:none;font:inherit;font-weight:500;color:var(--ink);outline:0;width:100%}
+.route input+input{border-top:1px solid var(--line)}
+.route .rail{position:absolute;left:18px;top:20px;bottom:20px;width:2px;background:var(--mute);opacity:.5}
+.route .rail::before,.route .rail::after{content:"";position:absolute;left:-4px;width:10px;height:10px}
+.route .rail::before{top:-6px;border-radius:50%;background:var(--ink)}
+.route .rail::after{bottom:-6px;background:var(--y);border:2px solid var(--ink)}
+.swap{width:40px;height:40px;border-radius:50%;background:var(--sf);display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.15);flex:none}
+.where{display:flex;align-items:center;gap:12px;height:58px;border-radius:29px;background:var(--sf);padding:0 8px 0 18px;box-shadow:0 6px 18px rgba(0,0,0,.14);font-weight:700}
+.where .later{margin-left:auto;background:var(--in);border-radius:20px;padding:8px 14px;font-size:13px;display:flex;gap:6px;align-items:center}
+.phone{display:flex;gap:8px}.phone .cc{width:92px;flex:none}
+.otp{display:flex;gap:8px}.otp input{width:100%;max-width:54px;height:60px;text-align:center;font:800 24px Manrope;border:1.5px solid var(--line);border-radius:14px;background:var(--sf);color:var(--ink);outline:0}
+.otp input:focus{border-color:var(--ink);box-shadow:0 0 0 3px var(--ty)}
+.promo{display:flex;border:1.5px dashed var(--ink);border-radius:14px;padding:4px;background:var(--ty)}
+.promo input{flex:1;border:0;background:none;padding:0 12px;font:800 15px Manrope;letter-spacing:.08em;outline:0;min-width:0;color:var(--ink)}
+.tips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tips button{height:46px;border-radius:12px;border:1.5px solid var(--line);font-weight:700}
+.tips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* BUTTONS */
+.btn{height:52px;padding:0 24px;border-radius:14px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.fill{background:var(--y);color:var(--yi)}
+.dark{background:var(--ink);color:var(--bg)}
+.tonal{background:var(--in)}
+.out{border:1.5px solid var(--ink)}
+.danger{background:var(--red);color:#fff}
+.sos{background:#FFE3E4;color:#B3151B}
+.pill{border-radius:99px}.block{width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.ibtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--in);flex:none}
+.ibtn.y{background:var(--y);color:var(--yi)}
+.seg{display:flex;background:var(--in);border-radius:14px;padding:4px}
+.seg button{flex:1;padding:10px 4px;border-radius:10px;font-weight:500;color:var(--mute)}
+.seg button.on{background:var(--sf);color:var(--ink);font-weight:800;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.chip{height:36px;padding:0 14px;border-radius:99px;background:var(--in);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500}
+.chip.on{background:var(--ink);color:var(--bg)}
+.slide{position:relative;height:60px;border-radius:16px;background:var(--y);color:var(--yi);display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;touch-action:none;user-select:none}
+.slide .knob{position:absolute;left:5px;top:5px;width:50px;height:50px;border-radius:12px;background:var(--ink);color:var(--y);display:grid;place-items:center;cursor:grab}
+.slide .txt{padding-left:30px}.slide.done{background:var(--grn);color:#fff}
+
+/* MAP / FAB */
+.stage{position:relative;height:150px;border-radius:18px;overflow:hidden;background:var(--map);
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:36px 36px}
+.stage svg.rt{position:absolute;inset:0;width:100%;height:100%}
+.fab{position:absolute;width:56px;height:56px;border-radius:50%;background:var(--sf);color:var(--ink);display:grid;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.25)}
+.fab.r{right:14px;bottom:14px}.fab.y{background:var(--y);color:var(--yi)}
+.fab.sm{width:44px;height:44px}
+.fab.sos{background:var(--red);color:#fff;font-weight:800;font-size:13px}
+.fab.ext{width:auto;padding:0 22px 0 18px;display:flex;gap:10px;font-weight:800;left:50%;transform:translateX(-50%);bottom:14px;border-radius:28px;height:54px;background:var(--ink);color:var(--bg)}
+.car{position:absolute;width:34px;height:34px;border-radius:50%;background:var(--ink);color:var(--y);display:grid;place-items:center;border:3px solid var(--sf);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.me{position:absolute;width:18px;height:18px;border-radius:50%;background:var(--blue);border:3px solid #fff;box-shadow:0 0 0 10px rgba(47,107,255,.2)}
+.dest{position:absolute;width:16px;height:16px;background:var(--y);border:3px solid var(--ink)}
+.eta{position:absolute;background:var(--ink);color:var(--bg);font-size:12px;font-weight:800;border-radius:10px;padding:3px 8px}
+.pulse{position:relative;width:90px;height:90px;margin:auto;display:grid;place-items:center}
+.pulse::before,.pulse::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--y);opacity:.5;animation:p 1.8s infinite}
+.pulse::after{animation-delay:.9s}
+.pulse span{position:relative;width:48px;height:48px;border-radius:50%;background:var(--y);color:var(--yi);display:grid;place-items:center}
+@keyframes p{from{transform:scale(.5);opacity:.6}to{transform:scale(1.2);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pulse::before,.pulse::after{animation:none}}
+
+/* TILES */
+.tile{display:flex;gap:12px;align-items:center;padding:10px 6px;border-radius:14px;width:100%;text-align:left}
+.tile:hover{background:var(--in)}
+.ic{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--in);flex:none}
+.ic.y{background:var(--y);color:var(--yi)}
+.tm{flex:1;min-width:0}.tn{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.ts{color:var(--mute);font-size:13px;display:block}
+.price{font-weight:800}.price s{display:block;font-size:12px;font-weight:400;color:var(--mute)}
+.ride{border:2px solid transparent;border-radius:16px;padding:10px}
+.ride.sel{border-color:var(--ink);background:var(--in)}
+.ride .car-i{width:64px;height:40px;color:var(--ink)}
+.tag-s{font-size:11px;font-weight:800;border-radius:6px;padding:2px 8px;background:var(--ty)}
+.tag-s.g{background:#D8F3E3;color:#0A6B30}
+.radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none}
+.tile.on .radio{border:7px solid var(--ink)}
+
+/* CARDS */
+.card{border:1px solid var(--line);border-radius:22px;padding:14px;background:var(--sf);display:flex;flex-direction:column;gap:10px}
+.av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#FF8A5B,#E0457B);color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;flex:none;position:relative}
+.rate{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);background:var(--sf);color:var(--ink);border-radius:10px;font-size:11px;padding:0 6px;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.plate{display:inline-block;background:var(--y);color:var(--yi);font:800 15px Manrope;border:2px solid var(--ink);border-radius:8px;padding:2px 10px;letter-spacing:.06em}
+.otpc{background:var(--ty);border-radius:14px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.otpc b{font:800 22px Manrope;letter-spacing:.3em}
+.live{background:var(--ink);color:var(--bg);border:0}
+.live .meta{color:var(--mute)}.live .big{font:800 30px/1 Manrope}
+.bar{height:6px;background:rgba(255,255,255,.18);border-radius:3px;overflow:hidden}.bar i{display:block;width:62%;height:100%;background:var(--y)}
+.fare .ln{display:flex;justify-content:space-between}
+.fare .tot{border-top:1px dashed var(--line);padding-top:10px;font-weight:800;font-size:18px}
+.promoc{background:linear-gradient(120deg,#FFC61A,#FF9F1A);color:var(--yi);border:0}
+.promoc .big{font:800 28px/1 Manrope}
+.stars{font-size:30px;color:var(--y);letter-spacing:4px;text-shadow:0 0 1px #8a6a00}
+.steps{display:flex;align-items:center}
+.steps .s{width:26px;height:26px;border-radius:50%;background:var(--in);color:var(--mute);display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.steps .s.on{background:var(--y);color:var(--yi)}.steps .l{flex:1;height:3px;background:var(--in)}.steps .l.on{background:var(--y)}
+.empty{text-align:center;border-style:dashed;align-items:center;color:var(--mute)}
+
+/* SHEET / NAV */
+.sheet{background:var(--sf);border:1px solid var(--line);border-radius:28px 28px 18px 18px;padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 -8px 24px rgba(0,0,0,.08)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);align-self:center}
+.appbar{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:18px;background:var(--sf);border:1px solid var(--line)}
+.appbar .t{flex:1;font-weight:800;font-size:17px}
+.nav{display:flex;background:var(--sf);border:1px solid var(--line);border-radius:20px;padding:6px}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:14px;font-size:12px;color:var(--mute)}
+.nav button.on{background:var(--y);color:var(--yi);font-weight:800}
+.toast{background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toast button{color:var(--y);font-weight:800}
+.alert{border-radius:14px;padding:12px 14px;display:flex;gap:10px;background:#FFE3E4;color:#7A0F13}
+.tog{width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;transition:.2s;flex:none}
+.tog::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on{background:var(--grn)}.tog.on::after{left:26px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="car" viewBox="0 0 24 24"><path d="M5 17H3v-5l2-5h14l2 5v5h-2M5 12h14"/><circle cx="7.5" cy="17" r="1.8"/><circle cx="16.5" cy="17" r="1.8"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="loc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="swap" viewBox="0 0 24 24"><path d="M7 4v16M7 20l-3-3M7 20l3-3M17 20V4M17 4l-3 3M17 4l3 3"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 11 12 3l9 8M5 10v10h14V10"/></symbol>
+<symbol id="work" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-5.4A8 8 0 1 1 21 12z"/></symbol>
+<symbol id="shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="m9 10.5 6-3M9 13.5l6 3"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="tag" viewBox="0 0 24 24"><path d="M3 12V3h9l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.2"/></symbol>
+</defs></svg>
+
+<div class="wrap">
+<button class="theme" onclick="tt()">Toggle theme</button>
+<h1>Taxi booking UI kit</h1>
+<p class="sub">Request, track and pay for a ride. Signal yellow for the one main action, ink for everything else. Plain HTML and CSS; the script only powers the demos.</p>
+
+<h2>Inputs</h2>
+<p class="note">Route fields with a swap button, a "Where to?" launcher, phone, OTP, promo and tip.</p>
+<div class="grid">
+ <div class="panel"><span class="tag">Pickup and destination</span>
+  <div class="route"><i class="rail"></i><div class="col"><input value="Current location" aria-label="Pickup"><input placeholder="Where to?" aria-label="Destination"></div><button class="swap" aria-label="Swap"><svg class="i"><use href="#swap"/></svg></button></div>
+  <span class="tag">"Where to?" launcher</span>
+  <div class="stage" style="height:110px"><div class="where" style="position:absolute;left:12px;right:12px;top:26px"><svg class="i"><use href="#search"/></svg>Where to?<span class="later"><svg class="i" style="width:16px;height:16px"><use href="#clock"/></svg>Now</span></div></div>
+ </div>
+ <div class="panel"><span class="tag">Phone number</span>
+  <div class="phone"><label class="field cc"><select aria-label="Country code"><option>+91</option><option>+1</option><option>+44</option></select></label><label class="field" style="flex:1"><svg class="i"><use href="#phone"/></svg><input type="tel" placeholder="Mobile number"></label></div>
+  <span class="tag">OTP</span>
+  <div class="otp"><input maxlength="1" value="5"><input maxlength="1" value="2"><input maxlength="1"><input maxlength="1"></div>
+  <span class="tag">Error state</span>
+  <label class="field err"><svg class="i"><use href="#pin"/></svg><input value="Marine Dr"></label>
+  <span class="meta" style="color:var(--red);margin-top:-8px">We don't serve this area yet.</span>
+ </div>
+ <div class="panel"><span class="tag">Promo code</span>
+  <div class="promo"><input value="FIRST50" aria-label="Promo code"><button class="btn dark" style="height:42px;border-radius:10px">Apply</button></div>
+  <span class="tag">Tip your driver</span>
+  <div class="tips" id="tp"><button>₹0</button><button class="on">₹20</button><button>₹50</button><button>Other</button></div>
+  <span class="tag">Note to driver</span>
+  <label class="field"><svg class="i"><use href="#chat"/></svg><input placeholder="Gate 2, blue building"></label>
+ </div>
+</div>
+
+<h2>Buttons</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Primary, dark, outlined, tonal, danger</span>
+  <div class="row"><button class="btn fill">Book Sedan</button><button class="btn dark">Schedule</button><button class="btn out">Add stop</button></div>
+  <div class="row"><button class="btn tonal">Cancel ride</button><button class="btn danger">Report issue</button><button class="btn sos"><svg class="i"><use href="#shield"/></svg>SOS</button></div>
+  <button class="btn fill block">Confirm pickup</button>
+  <button class="btn fill block" disabled>Choose a ride</button>
+ </div>
+ <div class="panel"><span class="tag">Slide to confirm (drag the knob)</span>
+  <div class="slide" id="sl"><div class="knob" id="kn"><svg class="i"><use href="#arrow"/></svg></div><span class="txt" id="sx">Slide to confirm booking</span></div>
+  <span class="tag">Segmented: when</span>
+  <div class="seg" id="sg"><button class="on">Now</button><button>Schedule</button><button>Hourly</button></div>
+  <span class="tag">Chips</span>
+  <div class="row" id="ch"><button class="chip on">Cash</button><button class="chip">Card</button><button class="chip">Wallet</button><button class="chip"><svg class="i" style="width:16px;height:16px"><use href="#tag"/></svg>Offers</button></div>
+  <span class="tag">Round icon buttons</span>
+  <div class="row"><button class="ibtn y" aria-label="Call"><svg class="i"><use href="#phone"/></svg></button><button class="ibtn" aria-label="Chat"><svg class="i"><use href="#chat"/></svg></button><button class="ibtn" aria-label="Share"><svg class="i"><use href="#share"/></svg></button></div>
+ </div>
+</div>
+
+<h2>FAB and map markers</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Locate FAB, SOS FAB, cars nearby, route</span>
+  <div class="stage" style="height:210px">
+   <svg class="rt" viewBox="0 0 300 210" preserveAspectRatio="none"><path d="M60 150 L60 90 L180 90 L180 40 L245 40" fill="none" stroke="var(--ink)" stroke-width="4" stroke-linejoin="round"/></svg>
+   <div class="me" style="left:52px;top:142px"></div>
+   <i class="dest" style="left:237px;top:32px"></i>
+   <div class="car" style="left:110px;top:150px"><svg class="i" style="width:16px;height:16px"><use href="#car"/></svg></div>
+   <div class="car" style="left:210px;top:110px"><svg class="i" style="width:16px;height:16px"><use href="#car"/></svg></div>
+   <span class="eta" style="left:100px;top:72px">12 min</span>
+   <button class="fab sm sos" style="left:14px;top:14px" aria-label="SOS">SOS</button>
+   <button class="fab r" aria-label="Locate me"><svg class="i"><use href="#loc"/></svg></button>
+  </div>
+ </div>
+ <div class="panel"><span class="tag">Extended FAB</span>
+  <div class="stage"><button class="fab ext"><svg class="i"><use href="#car"/></svg>Book a ride</button></div>
+  <span class="tag">Yellow circle FAB</span>
+  <div class="stage" style="height:100px"><button class="fab r y" style="bottom:22px" aria-label="Add stop"><svg class="i"><use href="#plus"/></svg></button></div>
+  <span class="tag">Searching for driver</span>
+  <div class="pulse"><span><svg class="i"><use href="#car"/></svg></span></div>
+ </div>
+</div>
+
+<h2>List tiles</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Choose a ride (selectable)</span>
+  <button class="tile ride sel"><svg class="car-i" viewBox="0 0 64 40"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M6 28h-2v-8l5-3 7-8h22l8 8 10 2v9h-3"/><circle cx="17" cy="29" r="4"/><circle cx="46" cy="29" r="4"/></g></svg><span class="tm"><span class="tn">Sedan</span><span class="ts">3 min · 4 seats</span></span><span class="price">₹210</span></button>
+  <button class="tile ride"><svg class="car-i" viewBox="0 0 64 40"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M8 28H6v-9l6-3 6-7h20l6 7 10 3v9h-3"/><circle cx="19" cy="29" r="4"/><circle cx="46" cy="29" r="4"/></g></svg><span class="tm"><span class="tn">Mini <span class="tag-s g">Cheapest</span></span><span class="ts">5 min · 4 seats</span></span><span class="price">₹165</span></button>
+  <button class="tile ride"><svg class="car-i" viewBox="0 0 64 40"><g fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><path d="M5 28H3V14l4-6h38l9 8 7 3v9h-3"/><circle cx="16" cy="29" r="4"/><circle cx="47" cy="29" r="4"/></g></svg><span class="tm"><span class="tn">XL</span><span class="ts">8 min · 6 seats</span></span><span class="price">₹320<s>₹360</s></span></button>
+ </div>
+ <div class="panel"><span class="tag">Saved and recent places</span>
+  <button class="tile"><span class="ic"><svg class="i"><use href="#home"/></svg></span><span class="tm"><span class="tn">Home</span><span class="ts">12, Ring Road</span></span></button>
+  <button class="tile"><span class="ic"><svg class="i"><use href="#work"/></svg></span><span class="tm"><span class="tn">Work</span><span class="ts">Tech Park, Tower B</span></span></button>
+  <button class="tile"><span class="ic"><svg class="i"><use href="#clock"/></svg></span><span class="tm"><span class="tn">Central Station</span><span class="ts">Station Rd · 4.2 km</span></span></button>
+  <span class="tag">Payment (selectable)</span>
+  <button class="tile on"><span class="ic y"><svg class="i"><use href="#wallet"/></svg></span><span class="tm"><span class="tn">Cash</span><span class="ts">Pay the driver</span></span><i class="radio"></i></button>
+  <div class="tile"><span class="ic"><svg class="i"><use href="#shield"/></svg></span><span class="tm"><span class="tn">Share live trip</span><span class="ts">Auto-share with contacts</span></span><button class="tog on" aria-label="Toggle" onclick="this.classList.toggle('on')"></button></div>
+ </div>
+</div>
+
+<h2>Cards</h2>
+<div class="grid">
+ <div class="card"><div class="row" style="flex-wrap:nowrap"><div class="av">RS<span class="rate">★ 4.9</span></div><div class="tm"><b style="font-size:17px">Rajesh Sharma</b><span class="ts">White Swift Dzire</span><span class="plate">GJ 03 AB 4821</span></div><div class="price" style="text-align:right">3<span class="ts">min</span></div></div>
+  <div class="otpc"><span class="meta">Share PIN with driver</span><b>4827</b></div>
+  <div class="row"><button class="btn tonal" style="flex:1"><svg class="i"><use href="#chat"/></svg>Message</button><button class="btn fill" style="flex:1"><svg class="i"><use href="#phone"/></svg>Call</button></div></div>
+ <div class="card live"><div class="row sp"><span class="tag-s" style="color:var(--yi);background:var(--y)">On trip</span><span class="meta">Arrive 10:42 AM</span></div>
+  <div class="big">12 min left</div><div class="bar"><i></i></div><span class="meta">To Tech Park, Tower B · 4.1 km</span>
+  <div class="row"><button class="btn tonal" style="flex:1;background:rgba(255,255,255,.12);color:var(--bg)"><svg class="i"><use href="#share"/></svg>Share trip</button><button class="btn sos" style="flex:1"><svg class="i"><use href="#shield"/></svg>SOS</button></div></div>
+ <div class="card fare"><b>Fare breakdown</b><div class="ln"><span class="ts">Base fare</span><span>₹50</span></div><div class="ln"><span class="ts">Distance 6.2 km</span><span>₹112</span></div><div class="ln"><span class="ts">Time 18 min</span><span>₹36</span></div><div class="ln"><span class="ts">Promo FIRST50</span><span style="color:var(--grn)">−₹50</span></div><div class="ln tot"><span>Total</span><span>₹148</span></div></div>
+ <div class="card promoc"><span style="font-weight:700">Weekend offer</span><div class="big">50% off</div><span>Up to ₹100 on your next 2 rides.</span><button class="btn dark" style="height:42px;align-self:flex-start">Use code WKND50</button></div>
+ <div class="card"><b style="text-align:center">Rate Rajesh</b><div class="stars" style="text-align:center" role="group" aria-label="Rating">★★★★★</div><div class="row" style="justify-content:center"><span class="chip on">Clean car</span><span class="chip">Safe driving</span><span class="chip">Good chat</span></div><button class="btn fill">Submit rating</button></div>
+ <div class="card"><div class="row sp"><b>Ride receipt</b><span class="tag-s g">Paid</span></div><span class="ts">8 Oct · Central Station → Home</span><div class="row sp"><span class="ts">Sedan · Cash</span><span class="price">₹210</span></div><button class="btn tonal">Download invoice</button></div>
+ <div class="card empty"><svg class="i" style="width:34px;height:34px"><use href="#car"/></svg><b style="color:var(--ink)">No trips yet</b><span>Your rides will appear here.</span><button class="btn fill">Book a ride</button></div>
+ <div class="card"><div class="row"><div class="pulse" style="margin:0;width:60px;height:60px"><span style="width:34px;height:34px"><svg class="i" style="width:16px;height:16px"><use href="#car"/></svg></span></div><div class="tm"><b>Finding your driver</b><span class="ts">Contacting nearby cars…</span></div></div><button class="btn tonal">Cancel request</button></div>
+</div>
+
+<h2>Ride status, sheet, bar, nav, alerts</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Ride progress</span>
+  <div class="steps"><span class="s on">✓</span><i class="l on"></i><span class="s on">2</span><i class="l"></i><span class="s">3</span><i class="l"></i><span class="s">4</span></div>
+  <span class="meta">Booked · Driver arriving · On trip · Dropped off</span>
+  <span class="tag">App bar</span>
+  <div class="appbar"><button class="ibtn" aria-label="Back"><svg class="i"><use href="#back"/></svg></button><span class="t">Confirm ride</span><button class="ibtn" aria-label="Safety"><svg class="i"><use href="#shield"/></svg></button></div>
+  <span class="tag">Alert and snackbar</span>
+  <div class="alert"><svg class="i"><use href="#shield"/></svg><span>High demand: fares are 1.4× right now.</span></div>
+  <div class="toast"><span>Ride cancelled. No fee charged.</span><button>Undo</button></div>
+ </div>
+ <div class="panel"><span class="tag">Bottom sheet</span>
+  <div class="sheet"><i class="grab"></i><div class="row sp"><b style="font-size:18px">Pickup at Gate 2</b><span class="tag-s">3 min</span></div><span class="ts">City Mall, Ring Road</span>
+   <div class="row"><span class="chip on">Sedan</span><span class="chip">Cash</span><span class="chip">FIRST50</span></div>
+   <button class="btn fill block">Confirm Sedan · ₹148</button></div>
+  <span class="tag">Bottom navigation</span>
+  <div class="nav" id="nv"><button class="on"><svg class="i"><use href="#car"/></svg>Ride</button><button><svg class="i"><use href="#clock"/></svg>Trips</button><button><svg class="i"><use href="#wallet"/></svg>Wallet</button><button><svg class="i"><use href="#user"/></svg>Account</button></div>
+ </div>
+</div>
+</div>
+<script>
+function tt(){var r=document.documentElement,d=matchMedia('(prefers-color-scheme:dark)').matches,c=r.dataset.theme||(d?'dark':'light');r.dataset.theme=c==='dark'?'light':'dark'}
+function grp(id,sel){var b=document.querySelectorAll('#'+id+' '+sel);b.forEach(function(x){x.onclick=function(){b.forEach(function(y){y.classList.remove('on')});x.classList.add('on')}})}
+grp('sg','button');grp('nv','button');grp('tp','button');grp('ch','.chip');
+document.querySelectorAll('.ride').forEach(function(t,_,a){t.onclick=function(){a.forEach(function(y){y.classList.remove('sel')});t.classList.add('sel')}});
+var s=document.getElementById('sl'),k=document.getElementById('kn'),drag=false,x0=0;
+k.onpointerdown=function(e){if(s.classList.contains('done'))return;drag=true;x0=e.clientX;k.setPointerCapture(e.pointerId)};
+k.onpointermove=function(e){if(!drag)return;var m=s.clientWidth-60,d=Math.max(0,Math.min(m,e.clientX-x0));k.style.transform='translateX('+d+'px)';sx.style.opacity=1-d/m};
+k.onpointerup=function(){if(!drag)return;drag=false;var m=s.clientWidth-60,d=parseFloat((k.style.transform.match(/[\d.]+/)||[0])[0]);
+ if(d>m*.85){k.style.transform='translateX('+m+'px)';s.classList.add('done');sx.textContent='Booked! Finding a driver';sx.style.opacity=1;setTimeout(function(){s.classList.remove('done');k.style.transform='';sx.textContent='Slide to confirm booking'},2500)}
+ else{k.style.transform='';sx.style.opacity=1}};
+</script>
+</body>
+</html>

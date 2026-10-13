@@ -7,15 +7,15 @@
 
 export const colors = {
   // Brand
-  primary: '#7C5CFC',
-  primaryLight: '#9B7FFD',
-  primaryDark: '#5E3EDB',
-  primaryMuted: 'rgba(124, 92, 252, 0.12)',
+  primary: '#10A37F',
+  primaryLight: '#2BB995',
+  primaryDark: '#087F5B',
+  primaryMuted: 'rgba(16, 163, 127, 0.10)',
 
   // Accent
-  accent: '#00D4AA',
-  accentLight: '#33DDBB',
-  accentDark: '#00A884',
+  accent: '#10A37F',
+  accentLight: '#2BB995',
+  accentDark: '#087F5B',
 
   // Semantic
   success: '#22C55E',
@@ -23,25 +23,25 @@ export const colors = {
   error: '#EF4444',
   errorLight: 'rgba(239, 68, 68, 0.12)',
 
-  // Dark theme (primary)
-  bg: '#0A0A0F',
-  bgElevated: '#111118',
-  bgCard: '#16161F',
-  bgInput: '#1C1C28',
-  surface: '#1E1E2A',
-  surfaceHover: '#252535',
-  border: '#2A2A3A',
-  borderLight: '#353550',
+  // Clean light workspace
+  bg: '#FFFFFF',
+  bgElevated: '#FFFFFF',
+  bgCard: '#FFFFFF',
+  bgInput: '#F7F7F8',
+  surface: '#F4F4F4',
+  surfaceHover: '#ECECEC',
+  border: '#E5E5E5',
+  borderLight: '#D4D4D4',
 
   // Text
-  text: '#F0F0F8',
-  textSecondary: '#9090B0',
-  textTertiary: '#5A5A7A',
-  textInverted: '#0A0A0F',
+  text: '#202123',
+  textSecondary: '#666666',
+  textTertiary: '#888888',
+  textInverted: '#FFFFFF',
 
   // Canvas
-  canvasBg: '#07070D',
-  canvasGrid: 'rgba(124, 92, 252, 0.06)',
+  canvasBg: '#F7F7F8',
+  canvasGrid: 'rgba(0, 0, 0, 0.035)',
 
   // Overlays
   overlay: 'rgba(0, 0, 0, 0.6)',

@@ -1,0 +1,1 @@
+"""TezMind image search service."""

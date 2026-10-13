@@ -66,11 +66,12 @@ export const ICON_NAMES_ARRAY = Array.from(ICON_NAMES);
 /** Safe list of font families the AI may use. */
 export const ALLOWED_FONTS = [
   'Inter',
+  'Manrope',
+  'Plus Jakarta Sans',
   'Roboto',
   'Outfit',
   'Poppins',
   'Nunito',
-  'DM Sans',
   'system',
   'System',
 ] as const;

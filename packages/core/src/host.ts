@@ -64,7 +64,13 @@ export interface ProjectMeta {
   customWidth?: number;
   customHeight?: number;
   styleKeywords?: string[];
+  /** UI-kit choice; `auto` means recommend per screen prompt. */
+  uiKitId?: string;
+  /** Kit locked by the first successful generation when uiKitId is `auto`. */
+  resolvedUiKitId?: string;
   brandColor?: string;
+  /** Generate screens using Material Design 3 color roles and component guidance. */
+  materialDesign3?: boolean;
   defaultProvider?: string;
   defaultModelId?: string;
   createdAt: number;
@@ -72,6 +78,23 @@ export interface ProjectMeta {
   schemaVersion: number;
   /** Base64-encoded PNG thumbnail of the first screen. */
   thumbnail?: string;
+}
+
+export interface UiKitStyleContext {
+  id: string;
+  name: string;
+  vibe: string;
+  description: string;
+  sourceFile?: string;
+  palette: {
+    background: string;
+    surface: string;
+    text: string;
+    primary: string;
+    secondary: string;
+  };
+  fonts: { heading: string; body: string };
+  guidance: string;
 }
 
 export type DevicePreset =
@@ -120,6 +143,10 @@ export interface ScreenRecord extends ScreenMeta {
   /** Serialized DesignNode tree (JSON string for storage-efficiency). */
   rootJson: string;
   schemaVersion: number;
+  /** Per-screen primary seed color selected from its generation prompt. */
+  brandColor?: string;
+  /** M3 appearance selected from the generation prompt. */
+  colorScheme?: 'light' | 'dark';
 }
 
 export interface ComponentRecord {
@@ -146,6 +173,18 @@ export interface HistoryEntry {
   /** Serialized patch operations. */
   patchJson: string;
   description?: string;
+  prompt?: string;
+  action?: 'undo' | 'redo';
+}
+
+export interface ScreenActionRecord {
+  id: string;
+  projectId: string;
+  screenId: string;
+  timestamp: number;
+  kind: 'generate' | 'edit' | 'restore' | 'undo' | 'redo';
+  prompt: string;
+  description: string;
 }
 
 // ─── FILES ───────────────────────────────────────────────────────────────────

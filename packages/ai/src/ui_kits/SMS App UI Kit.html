@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SMS App UI Components</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF1F7;--surface:#fff;--ink:#14161F;--mute:#6A7087;--line:#DCE0EB;--p:#2F3FD6;--p-ink:#fff;--tonal:#E1E5FF;--tonal-ink:#1B2796;--hot:#FF5A4F;--in:#EEF0F6;--out:#2F3FD6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1018;--surface:#181B27;--ink:#EDEFF7;--mute:#98A0BC;--line:#2A2F42;--p:#7C89FF;--p-ink:#0B0F3A;--tonal:#262C5C;--tonal-ink:#D5DAFF;--in:#232738;--out:#5260F0}}
+:root[data-theme="dark"]{--bg:#0E1018;--surface:#181B27;--ink:#EDEFF7;--mute:#98A0BC;--line:#2A2F42;--p:#7C89FF;--p-ink:#0B0F3A;--tonal:#262C5C;--tonal-ink:#D5DAFF;--in:#232738;--out:#5260F0}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "DM Sans",system-ui,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 16px}
+h2{font-size:18px;margin:36px 0 4px}
+.note{color:var(--mute);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tag{font-size:12px;color:var(--mute);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.theme{float:right;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:8px 14px;font-size:13px}
+
+/* INPUTS */
+.f-out{position:relative}
+.f-out input{width:100%;height:54px;border:1.5px solid var(--line);border-radius:12px;background:transparent;color:var(--ink);padding:18px 14px 0;font:inherit;outline:0}
+.f-out label{position:absolute;left:14px;top:15px;color:var(--mute);transition:.15s;pointer-events:none;background:transparent}
+.f-out input:focus,.f-out input:not(:placeholder-shown){padding-top:20px}
+.f-out input:focus{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 25%,transparent)}
+.f-out input:focus+label,.f-out input:not(:placeholder-shown)+label{top:6px;font-size:12px;color:var(--p)}
+.f-fill input{width:100%;height:54px;border:0;border-bottom:2px solid var(--mute);background:var(--in);border-radius:12px 12px 0 0;padding:0 14px;color:var(--ink);font:inherit;outline:0}
+.f-fill input:focus{border-color:var(--p)}
+.search{display:flex;align-items:center;gap:10px;background:var(--in);border-radius:99px;padding:0 16px;height:48px;color:var(--mute)}
+.search input{flex:1;border:0;background:transparent;font:inherit;color:var(--ink);outline:0;min-width:0}
+.composer{display:flex;align-items:flex-end;gap:8px}
+.composer .box{flex:1;display:flex;align-items:flex-end;gap:6px;background:var(--in);border-radius:26px;padding:6px 8px 6px 14px}
+.composer textarea{flex:1;border:0;background:transparent;resize:none;font:inherit;color:var(--ink);outline:0;max-height:96px;padding:8px 0;min-width:0}
+.composer .send{width:46px;height:46px;border-radius:50%;background:var(--p);color:var(--p-ink);display:grid;place-items:center}
+.counter{font-size:12px;color:var(--mute);text-align:right}
+.otp{display:flex;gap:8px}
+.otp input{width:100%;max-width:52px;height:60px;text-align:center;font:700 24px "DM Sans";border:1.5px solid var(--line);border-radius:14px;background:transparent;color:var(--ink);outline:0}
+.otp input:focus{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 25%,transparent)}
+.err input{border-color:var(--hot)!important}.err .msg{color:var(--hot);font-size:12px;margin:4px 14px 0}
+
+/* BUTTONS */
+.btn{height:44px;padding:0 22px;border-radius:99px;font-weight:500;display:inline-flex;align-items:center;gap:8px;transition:transform .1s,filter .15s}
+.btn:active{transform:scale(.96)}
+.b-fill{background:var(--p);color:var(--p-ink)}
+.b-tonal{background:var(--tonal);color:var(--tonal-ink)}
+.b-out{border:1.5px solid var(--p);color:var(--p);background:transparent}
+.b-text{background:transparent;color:var(--p);padding:0 12px}
+.b-sq{border-radius:12px}
+.b-danger{background:var(--hot);color:#fff}
+.b-grad{background:linear-gradient(135deg,#2F3FD6,#8B5CF6);color:#fff}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.ibtn{width:44px;height:44px;border-radius:50%;background:transparent;display:grid;place-items:center}
+.ibtn:hover{background:var(--in)}
+.ibtn.f{background:var(--tonal);color:var(--tonal-ink)}
+.seg{display:inline-flex;background:var(--in);border-radius:99px;padding:4px}
+.seg button{background:transparent;padding:8px 16px;border-radius:99px;font-weight:500;color:var(--mute)}
+.seg button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.chip{height:34px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:transparent;font-size:14px}
+.chip.on{background:var(--tonal);color:var(--tonal-ink);border-color:transparent}
+
+/* FAB */
+.stage{position:relative;height:170px;background:var(--in);border-radius:16px;overflow:hidden}
+.fab{position:absolute;right:16px;bottom:16px;width:58px;height:58px;border-radius:18px;background:var(--p);color:var(--p-ink);display:grid;place-items:center;box-shadow:0 6px 16px rgba(47,63,214,.4)}
+.fab.round{border-radius:50%}
+.fab.small{width:44px;height:44px;border-radius:14px;bottom:84px;right:23px;background:var(--tonal);color:var(--tonal-ink);box-shadow:0 3px 8px rgba(0,0,0,.2)}
+.fab.ext{width:auto;padding:0 20px 0 16px;display:flex;gap:10px;font-weight:700;right:auto;left:16px}
+.fab:hover{filter:brightness(1.08)}
+.speed{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.speed .mini{display:none;align-items:center;gap:8px}
+.speed.open .mini{display:flex}
+.speed .lbl{background:var(--surface);padding:4px 10px;border-radius:8px;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.speed .fab{position:static}
+.speed.open .fab.main svg{transform:rotate(45deg)}
+.fab.main svg{transition:transform .2s}
+
+/* LIST TILE */
+.tile{display:flex;gap:12px;align-items:center;padding:10px 6px;border-radius:14px;width:100%;background:transparent;text-align:left}
+.tile:hover{background:var(--in)}
+.av{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff;flex:none;position:relative}
+.av .on{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:#2DBE6C;border:2px solid var(--surface)}
+.t-main{flex:1;min-width:0}
+.t-top{display:flex;justify-content:space-between;gap:8px}
+.t-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t-time{font-size:12px;color:var(--mute);white-space:nowrap}
+.t-prev{color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.unread .t-prev{color:var(--ink);font-weight:500}.unread .t-time{color:var(--p);font-weight:700}
+.badge{min-width:20px;height:20px;border-radius:10px;background:var(--hot);color:#fff;font-size:11px;font-weight:700;display:inline-grid;place-items:center;padding:0 6px}
+.tile.sq .av{border-radius:14px}
+.tile.sel{background:var(--tonal)}
+.sw{position:relative;overflow:hidden;border-radius:14px}
+.sw .act{position:absolute;inset:0;background:var(--hot);color:#fff;display:flex;justify-content:flex-end;align-items:center;padding-right:22px;font-weight:700}
+.sw .tile{position:relative;background:var(--surface);transition:transform .2s}
+.sw:hover .tile{transform:translateX(-84px)}
+
+/* CARDS */
+.card{border:1px solid var(--line);border-radius:18px;padding:14px;background:var(--surface)}
+.elev{border:0;box-shadow:0 4px 18px rgba(20,22,31,.12)}
+.c-otp{background:linear-gradient(135deg,#2F3FD6,#6E5BFF);color:#fff;border:0}
+.c-otp .code{font:700 34px/1 "DM Sans";letter-spacing:.3em;margin:8px 0}
+.c-otp .btn{background:rgba(255,255,255,.2);color:#fff;height:36px}
+.c-bank{border-left:5px solid #2DBE6C}
+.c-bank .amt{font-size:22px;font-weight:700}
+.c-promo{background:var(--tonal);color:var(--tonal-ink);border:0}
+.c-track .bar{height:6px;background:var(--line);border-radius:3px;margin:12px 0 6px;overflow:hidden}
+.c-track .bar i{display:block;height:100%;width:66%;background:var(--p);border-radius:3px}
+.meta{font-size:12px;color:var(--mute)}
+.pill-s{display:inline-block;font-size:11px;font-weight:700;background:#D6F5E3;color:#146C3B;border-radius:6px;padding:2px 8px}
+
+/* BUBBLES */
+.chat{background:var(--in);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.bub{max-width:78%;padding:9px 14px;border-radius:20px;word-wrap:break-word}
+.bub.in{background:var(--surface);align-self:flex-start;border-bottom-left-radius:6px}
+.bub.out{background:var(--out);color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+.bub.in+.bub.in{border-top-left-radius:6px}.bub.out+.bub.out{border-top-right-radius:6px}
+.bub.sharp{border-radius:4px}
+.day{align-self:center;font-size:12px;color:var(--mute);background:var(--surface);padding:2px 10px;border-radius:99px;margin:6px 0}
+.status{align-self:flex-end;font-size:11px;color:var(--mute)}
+.typing{align-self:flex-start;background:var(--surface);padding:12px 14px;border-radius:20px;display:flex;gap:4px}
+.typing i{width:7px;height:7px;border-radius:50%;background:var(--mute);animation:b 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,60%,100%{opacity:.3;transform:none}30%{opacity:1;transform:translateY(-4px)}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none}}
+
+/* APP BAR + NAV */
+.appbar{display:flex;align-items:center;gap:6px;padding:6px 8px;background:var(--surface);border-radius:16px;border:1px solid var(--line)}
+.appbar .ttl{flex:1;font-weight:700;font-size:17px;padding-left:6px}
+.appbar.center .ttl{text-align:center}
+.nav{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:8px}
+.nav button{flex:1;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;color:var(--mute);padding:4px 0;position:relative}
+.nav button .pl{padding:4px 20px;border-radius:99px;display:grid}
+.nav button.on{color:var(--ink);font-weight:700}.nav button.on .pl{background:var(--tonal);color:var(--tonal-ink)}
+.nav .badge{position:absolute;top:0;right:22%}
+.toast{background:var(--ink);color:var(--surface);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toast button{background:transparent;color:var(--p);font-weight:700}
+.toast button{color:#9FB0FF}
+.tog{width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;transition:.2s}
+.tog::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on{background:var(--p)}.tog.on::after{left:26px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="send" viewBox="0 0 24 24"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></symbol>
+<symbol id="chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-5.4A8 8 0 1 1 21 12z"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+<symbol id="attach" viewBox="0 0 24 24"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></symbol>
+<symbol id="smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+<symbol id="cog" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.3 1a7 7 0 0 0-2-1.2L14 3h-4l-.4 2.7a7 7 0 0 0-2 1.2l-2.3-1-2 3.4 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.4 2.3-1a7 7 0 0 0 2 1.2L10 21h4l.4-2.7a7 7 0 0 0 2-1.2l2.3 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></symbol>
+</defs></svg>
+
+<div class="wrap">
+<button class="theme" onclick="tt()">Toggle theme</button>
+<h1>SMS app UI kit</h1>
+<p class="sub">Inputs, buttons, FABs, list tiles, cards, bubbles and navigation. Everything is plain HTML and CSS; the small script only powers the demos.</p>
+
+<h2>Inputs</h2>
+<p class="note">Pick one field style for the whole app. The message composer is the one input people use all day.</p>
+<div class="grid">
+ <div class="panel"><span class="tag">Outlined, floating label</span>
+  <div class="f-out"><input id="a" placeholder=" "><label for="a">Phone number</label></div>
+  <span class="tag">Filled</span>
+  <div class="f-fill"><input placeholder="To: name or number"></div>
+  <span class="tag">Error state</span>
+  <div class="f-out err"><input id="e" placeholder=" " value="98765"><label for="e">Phone number</label><div class="msg">Enter a 10-digit number</div></div>
+ </div>
+ <div class="panel"><span class="tag">Search pill</span>
+  <div class="search"><svg class="i"><use href="#search"/></svg><input placeholder="Search messages"></div>
+  <span class="tag">Message composer (auto-grows, send appears with text)</span>
+  <div class="composer"><div class="box"><button class="ibtn" aria-label="Attach"><svg class="i"><use href="#attach"/></svg></button><textarea id="ta" rows="1" placeholder="Type a message" oninput="g(this)"></textarea></div><button class="send" id="sb" aria-label="Send" style="border:0"><svg class="i"><use href="#send"/></svg></button></div>
+  <div class="counter" id="ct">0 / 160</div>
+ </div>
+ <div class="panel"><span class="tag">OTP code boxes</span>
+  <div class="otp"><input maxlength="1" inputmode="numeric" value="4"><input maxlength="1" inputmode="numeric" value="8"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"><input maxlength="1" inputmode="numeric"></div>
+  <span class="tag">Toggle and chips</span>
+  <div class="row"><button class="tog on" aria-label="Notifications" onclick="this.classList.toggle('on')"></button><span>Delivery reports</span></div>
+  <div class="row"><button class="chip on">All</button><button class="chip">Unread</button><button class="chip">Spam</button></div>
+ </div>
+</div>
+
+<h2>Buttons</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Fill, tonal, outlined, text</span>
+  <div class="row"><button class="btn b-fill">Send</button><button class="btn b-tonal">Reply</button><button class="btn b-out">Forward</button><button class="btn b-text">Cancel</button></div>
+  <span class="tag">With icon, disabled, danger</span>
+  <div class="row"><button class="btn b-fill"><svg class="i"><use href="#send"/></svg>Send</button><button class="btn b-fill" disabled>Sending</button><button class="btn b-danger">Delete</button></div>
+ </div>
+ <div class="panel"><span class="tag">Squared and gradient</span>
+  <div class="row"><button class="btn b-fill b-sq">Block number</button><button class="btn b-grad">Upgrade</button></div>
+  <span class="tag">Icon buttons</span>
+  <div class="row"><button class="ibtn" aria-label="Search"><svg class="i"><use href="#search"/></svg></button><button class="ibtn f" aria-label="Edit"><svg class="i"><use href="#edit"/></svg></button><button class="ibtn" aria-label="More"><svg class="i"><use href="#more"/></svg></button></div>
+  <span class="tag">Segmented</span>
+  <div class="seg" id="sg"><button class="on">SMS</button><button>MMS</button><button>RCS</button></div>
+ </div>
+</div>
+
+<h2>FAB (floating action button)</h2>
+<p class="note">Usually "New message", fixed bottom-right, 16px from the edges.</p>
+<div class="grid">
+ <div class="panel"><span class="tag">Rounded square, circle, small</span>
+  <div class="stage"><button class="fab small" aria-label="Scan"><svg class="i"><use href="#search"/></svg></button><button class="fab" aria-label="New message"><svg class="i"><use href="#edit"/></svg></button></div>
+  <div class="stage"><button class="fab round" aria-label="Add"><svg class="i"><use href="#plus"/></svg></button></div>
+ </div>
+ <div class="panel"><span class="tag">Extended</span>
+  <div class="stage"><button class="fab ext"><svg class="i"><use href="#edit"/></svg>Compose</button></div>
+  <span class="tag">Speed dial (tap)</span>
+  <div class="stage" style="height:210px"><div class="speed" id="sp"><div class="mini"><span class="lbl">New group</span><button class="fab small" style="position:static" aria-label="New group"><svg class="i"><use href="#user"/></svg></button></div><div class="mini"><span class="lbl">New message</span><button class="fab small" style="position:static" aria-label="New message"><svg class="i"><use href="#chat"/></svg></button></div><button class="fab main" onclick="sp.classList.toggle('open')" aria-label="Open actions"><svg class="i"><use href="#plus"/></svg></button></div></div>
+ </div>
+</div>
+
+<h2>List tiles (conversation rows)</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Standard, unread, online dot</span>
+  <button class="tile unread"><span class="av" style="background:#E0457B">AK<i class="on"></i></span><span class="t-main"><span class="t-top"><span class="t-name">Aarav Kumar</span><span class="t-time">9:41</span></span><span class="t-top"><span class="t-prev">Are we still meeting at 6?</span><span class="badge">3</span></span></span></button>
+  <button class="tile"><span class="av" style="background:#2F3FD6">M</span><span class="t-main"><span class="t-top"><span class="t-name">Mom</span><span class="t-time">Yesterday</span></span><span class="t-prev">Call me when you're free</span></span></button>
+  <button class="tile sq"><span class="av" style="background:#14161F"><svg class="i"><use href="#lock"/></svg></span><span class="t-main"><span class="t-top"><span class="t-name">HDFCBK</span><span class="t-time">Mon</span></span><span class="t-prev">Your OTP is 482913. Do not share.</span></span></button>
+ </div>
+ <div class="panel"><span class="tag">Selected (multi-select)</span>
+  <button class="tile sel"><span class="av" style="background:#8B5CF6">✓</span><span class="t-main"><span class="t-top"><span class="t-name">Design team</span><span class="t-time">Sun</span></span><span class="t-prev">Priya: uploaded the final file</span></span></button>
+  <span class="tag">Swipe to delete (hover on desktop)</span>
+  <div class="sw"><div class="act">Delete</div><button class="tile"><span class="av" style="background:#E08A1E">D</span><span class="t-main"><span class="t-top"><span class="t-name">Delivery</span><span class="t-time">Sat</span></span><span class="t-prev">Your parcel arrives today</span></span></button></div>
+  <span class="tag">Settings tile</span>
+  <button class="tile"><span class="av" style="background:var(--tonal);color:var(--tonal-ink)"><svg class="i"><use href="#cog"/></svg></span><span class="t-main"><span class="t-name">Notifications</span><br><span class="t-prev">Sounds, vibration, popups</span></span><span class="tog on" style="flex:none"></span></button>
+ </div>
+</div>
+
+<h2>Cards</h2>
+<div class="grid">
+ <div class="card c-otp"><span class="meta" style="color:#DDE">Verification code · HDFC Bank</span><div class="code">482913</div><button class="btn">Copy code</button></div>
+ <div class="card c-bank"><span class="pill-s">Credited</span><div class="amt">₹12,500.00</div><div class="meta">A/c XX4821 · 9 Oct, 10:12 · Bal ₹48,210</div></div>
+ <div class="card c-track"><b>Order #A2931 is out for delivery</b><div class="bar"><i></i></div><div class="meta">Arriving today by 7 pm</div></div>
+ <div class="card c-promo"><b>Weekend offer</b><p style="margin:4px 0 10px">Get 20% off on recharge above ₹299.</p><button class="btn b-fill" style="height:36px">Recharge now</button></div>
+ <div class="card elev"><div class="row" style="justify-content:space-between"><b>Contact</b><span class="meta">Elevated card</span></div><div class="tile" style="padding:8px 0"><span class="av" style="background:#E0457B">AK</span><span class="t-main"><b>Aarav Kumar</b><br><span class="t-prev">+91 98765 43210</span></span></div><div class="row"><button class="btn b-tonal" style="height:36px">Message</button><button class="btn b-text" style="height:36px">Call</button></div></div>
+ <div class="card" style="border-style:dashed;text-align:center;color:var(--mute)"><svg class="i" style="width:32px;height:32px"><use href="#chat"/></svg><p style="margin:6px 0 10px">No messages yet</p><button class="btn b-fill">Start a chat</button></div>
+</div>
+
+<h2>Chat bubbles</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Rounded, grouped corners</span>
+  <div class="chat"><span class="day">Today</span><div class="bub in">Hey! Did you get the file?</div><div class="bub in">Sent it an hour ago</div><div class="bub out">Yes, thanks!</div><div class="bub out">Reviewing it now</div><span class="status">Delivered</span><div class="typing"><i></i><i></i><i></i></div></div>
+ </div>
+ <div class="panel"><span class="tag">Sharp-corner variant</span>
+  <div class="chat"><div class="bub in sharp">Lunch at 1?</div><div class="bub out sharp">Works for me</div></div>
+  <span class="tag">Quick replies</span>
+  <div class="row"><button class="chip">👍 Sounds good</button><button class="chip">On my way</button><button class="chip">Call you later</button></div>
+ </div>
+</div>
+
+<h2>App bar, bottom nav, snackbar</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Top bars</span>
+  <div class="appbar"><span class="ttl">Messages</span><button class="ibtn" aria-label="Search"><svg class="i"><use href="#search"/></svg></button><button class="ibtn" aria-label="More"><svg class="i"><use href="#more"/></svg></button></div>
+  <div class="appbar center"><button class="ibtn" aria-label="Back"><svg class="i"><use href="#back"/></svg></button><span class="ttl">Aarav Kumar</span><button class="ibtn" aria-label="More"><svg class="i"><use href="#more"/></svg></button></div>
+ </div>
+ <div class="panel"><span class="tag">Bottom navigation</span>
+  <div class="nav" id="nv"><button class="on"><span class="pl"><svg class="i"><use href="#chat"/></svg></span>Chats<span class="badge">5</span></button><button><span class="pl"><svg class="i"><use href="#user"/></svg></span>Contacts</button><button><span class="pl"><svg class="i"><use href="#cog"/></svg></span>Settings</button></div>
+  <span class="tag">Snackbar</span>
+  <div class="toast"><span>Conversation deleted</span><button>Undo</button></div>
+ </div>
+</div>
+</div>
+<script>
+function tt(){var r=document.documentElement,d=matchMedia('(prefers-color-scheme:dark)').matches;var cur=r.dataset.theme||(d?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark'}
+function g(t){t.style.height='auto';t.style.height=t.scrollHeight+'px';ct.textContent=t.value.length+' / 160'}
+function grp(id){document.querySelectorAll('#'+id+' button').forEach(function(b){b.onclick=function(){document.querySelectorAll('#'+id+' button').forEach(function(x){x.classList.remove('on')});b.classList.add('on')}})}
+grp('sg');grp('nv');
+</script>
+</body>
+</html>

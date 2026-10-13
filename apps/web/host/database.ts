@@ -12,7 +12,7 @@
  */
 
 import Dexie, { type Table } from 'dexie';
-import type { ProjectMeta, ScreenRecord, ComponentRecord, AssetRecord, HistoryEntry } from '@tezmind/core';
+import type { ProjectMeta, ScreenRecord, ComponentRecord, AssetRecord, HistoryEntry, ScreenActionRecord } from '@tezmind/core';
 
 /** Per-screen code asset (CSS, JS, etc.) stored separately from the DSL */
 export interface ScreenAssetRow {
@@ -54,6 +54,7 @@ class TezMindDB extends Dexie {
   components!: Table<ComponentRow, string>;
   assets!: Table<AssetRow, string>;
   history!: Table<HistoryRow, string>;
+  screenActions!: Table<ScreenActionRecord, string>;
   settings!: Table<SettingsRow, string>;
   screenAssets!: Table<ScreenAssetRow, string>;
 
@@ -70,6 +71,9 @@ class TezMindDB extends Dexie {
     // v2: per-screen CSS/JS asset files
     this.version(2).stores({
       screenAssets: 'id, screenId, projectId, filename, updatedAt',
+    });
+    this.version(3).stores({
+      screenActions: 'id, projectId, screenId, timestamp, kind',
     });
   }
 }

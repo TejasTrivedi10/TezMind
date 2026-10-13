@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>20 UI style kits: palettes and Google Font pairings</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700&family=Inter:wght@400;600&family=Poppins:wght@400;700&family=Open+Sans:wght@400;600&family=Roboto:wght@400;700&family=Merriweather:wght@400;700&family=Lato:wght@400;700&family=Nunito:wght@400;700&family=Quicksand:wght@500;700&family=Outfit:wght@400;700&family=Orbitron:wght@500;800&family=Rajdhani:wght@500;700&family=Space+Grotesk:wght@500;700&family=Space+Mono&family=Sora:wght@400;700&family=DM+Sans:wght@400;700&family=IBM+Plex+Sans:wght@400;600&family=Syne:wght@500;800&family=Righteous&family=Fredoka:wght@400;600&family=Archivo+Black&family=Work+Sans:wght@400;600&family=Lilita+One&family=Rubik:wght@400;700&family=Montserrat:wght@500;800&family=Baloo+2:wght@500;700&family=Patrick+Hand&family=Caveat+Brush&family=Playfair+Display:wght@500;800&family=Source+Serif+4:wght@400;600&family=Michroma&family=Share+Tech+Mono&display=swap">
+<style>
+:root{--pg:#F6F6F4;--cd:#fff;--tx:#18181B;--mu:#6B6B72;--ln:#E3E3E0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pg:#121214;--cd:#1B1B1F;--tx:#EDEDF0;--mu:#9A9AA3;--ln:#2C2C32}}
+:root[data-theme="dark"]{--pg:#121214;--cd:#1B1B1F;--tx:#EDEDF0;--mu:#9A9AA3;--ln:#2C2C32}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--pg);color:var(--tx);font:15px/1.5 Inter,system-ui,sans-serif}
+header{max-width:1200px;margin:0 auto;padding:40px 20px 12px}
+h1{margin:0 0 8px;font:700 clamp(26px,5vw,40px)/1.1 Inter,sans-serif;letter-spacing:-.02em}
+header p{margin:0;color:var(--mu);max-width:60ch}
+main{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.card{background:var(--cd);border:1px solid var(--ln);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.stage{padding:20px;background:var(--st,var(--bg));min-height:190px;display:flex}
+.pv{flex:1;padding:18px;color:var(--t);background:var(--pbg,var(--sf));border:var(--pb,none);border-radius:var(--pr,12px);box-shadow:var(--ps,none);backdrop-filter:var(--bf,none);-webkit-backdrop-filter:var(--bf,none)}
+.pv h4{margin:0 0 6px;font-family:var(--hf);font-weight:var(--hw);font-size:22px;line-height:1.15}
+.pv p{margin:0 0 14px;font-family:var(--bfm);font-size:14px;opacity:.85}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:0;padding:9px 16px;border-radius:var(--br,8px);background:var(--a);color:var(--ab);font:600 13px var(--bfm);cursor:default}
+.chip{padding:7px 14px;border-radius:var(--br,8px);border:2px solid var(--b);color:var(--t);font:600 13px var(--bfm)}
+.meta{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.meta h2{margin:0;font-size:17px}
+.meta .d{margin:0;color:var(--mu);font-size:13px}
+.sw{display:flex;gap:6px}
+.sw button{flex:1;border:1px solid var(--ln);border-radius:8px;padding:0;background:none;cursor:pointer;color:var(--tx);font:11px/1.3 ui-monospace,Menlo,monospace;overflow:hidden}
+.sw i{display:block;height:34px}
+.sw span{display:block;padding:4px 0}
+.f{font-size:13px;color:var(--mu)}
+.f b{color:var(--tx);font-weight:600}
+.cp{align-self:flex-start;background:none;border:1px solid var(--ln);color:var(--tx);border-radius:8px;padding:6px 12px;font:600 12px Inter,sans-serif;cursor:pointer}
+.cp:focus-visible,.sw button:focus-visible{outline:2px solid #5B8CFF;outline-offset:2px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--tx);color:var(--pg);padding:8px 16px;border-radius:99px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+<h1>20 UI style kits</h1>
+<p>Each kit has a live preview, five colors, and a Google Fonts pairing. Click a swatch to copy its hex, or copy the whole kit as CSS variables.</p>
+</header>
+<main id="g"></main>
+<div id="toast" role="status"></div>
+<script>
+// name, blurb, bg, surface, text, accent, accent2, headFont, bodyFont, headWeight, stage/preview CSS
+var T=[
+["Minimalism","White space, one accent, quiet type.","#FAFAFA","#FFFFFF","#111111","#111111","#8A8A8A","Manrope","Inter",700,"--pb:1px solid #E6E6E6;--pr:6px"],
+["Flat design","Solid fills, no shadows, simple icons.","#ECF0F1","#FFFFFF","#2C3E50","#3498DB","#E74C3C","Poppins","Open Sans",700,"--pr:4px;--br:4px"],
+["Material design","Layered surfaces, tonal color, soft elevation.","#FFFBFE","#F3EDF7","#1C1B1F","#6750A4","#625B71","Roboto","Roboto",700,"--pr:20px;--br:99px;--ps:0 1px 3px rgba(0,0,0,.25)"],
+["Skeuomorphism","Leather, paper and stitched textures.","#B8A17F","#F1E6D0","#3B2A1A","#8C5A2B","#2E6F40","Merriweather","Lato",700,"--pr:10px;--pb:1px solid #8C7650;--ps:inset 0 1px 0 #fff,0 4px 8px rgba(0,0,0,.35);--pbg:linear-gradient(#F7EEDB,#E5D6B8)"],
+["Neumorphism","Soft extruded shapes on one base color.","#E0E5EC","#E0E5EC","#3D4468","#6C7CE8","#9AA3B8","Nunito","Quicksand",700,"--pr:22px;--br:14px;--ps:8px 8px 16px #A3B1C6,-8px -8px 16px #fff"],
+["Glassmorphism","Frosted translucent layers over color.","#2B1B5A","rgba(255,255,255,.14)","#FFFFFF","#7DF9FF","#FF7AC6","Outfit","Inter",700,"--st:linear-gradient(135deg,#2B1B5A,#0F6E8C);--pr:20px;--br:12px;--pb:1px solid rgba(255,255,255,.35);--bf:blur(14px)"],
+["Neon / cyberpunk","Near-black base with glowing edges.","#0A0A12","#14141F","#E8F9FF","#00F0FF","#FF2E88","Orbitron","Rajdhani",800,"--pr:8px;--pb:1px solid #00F0FF;--ps:0 0 18px rgba(0,240,255,.45)"],
+["Neo-brutalism","Thick outlines, hard shadows, loud color.","#FFF4D6","#FFFFFF","#000000","#FF5C8A","#3DDC97","Space Grotesk","Space Mono",700,"--pr:0;--br:0;--pb:3px solid #000;--ps:6px 6px 0 #000"],
+["Bento grid","Modular rounded tiles, Apple-style.","#F2F2F4","#FFFFFF","#1D1D1F","#0071E3","#FF9F0A","Sora","DM Sans",700,"--pr:26px;--br:99px"],
+["Dark mode UI","Muted dark surfaces with cool accents.","#0F1115","#1A1D24","#E6E8EE","#6EA8FE","#9B8CFF","IBM Plex Sans","Inter",600,"--pr:12px;--pb:1px solid #2A2E38"],
+["Gradient / aurora","Flowing mesh gradients behind soft cards.","#0B1020","rgba(255,255,255,.08)","#F1F5F9","#5EEAD4","#C084FC","Syne","Manrope",800,"--st:radial-gradient(at 20% 10%,#5EEAD4 0,transparent 45%),radial-gradient(at 85% 90%,#C084FC 0,transparent 50%),#0B1020;--pr:18px;--br:99px;--pb:1px solid rgba(255,255,255,.2);--bf:blur(10px)"],
+["Retro / vintage","Faded print palette, chunky type.","#F4E3C1","#FFF6DF","#3A2A1F","#D9482B","#2F7F86","Righteous","Poppins",400,"--pr:8px;--pb:2px solid #3A2A1F;--ps:5px 5px 0 #D9A441"],
+["Y2K / Frutiger Aero","Glossy bubbles, sky blues, lime pops.","#BFE6FF","#FFFFFF","#0B3C5D","#2DA8FF","#8AC400","Fredoka","Nunito",600,"--st:linear-gradient(#BFE6FF,#E9F8FF);--pr:28px;--br:99px;--pb:2px solid #fff;--ps:0 8px 20px rgba(45,168,255,.4)"],
+["Swiss / international","Grid, one red, objective sans-serif.","#FFFFFF","#F2F2F2","#000000","#E10600","#000000","Archivo Black","Work Sans",400,"--pr:0;--br:0;--pb:0;--ps:inset 0 6px 0 #000"],
+["Memphis","Squiggle-era shapes and clashing brights.","#FFF1E0","#FFFFFF","#1B1B3A","#FF4D8D","#2EC4B6","Lilita One","Rubik",400,"--pr:16px;--br:99px;--pb:3px solid #1B1B3A;--ps:6px 6px 0 #2EC4B6"],
+["Isometric","Angled 3D blocks with flat color faces.","#EAF1FB","#FFFFFF","#1F2A44","#4F7CFF","#FFB547","Montserrat","Open Sans",800,"--pr:14px;--ps:7px 7px 0 #C9D6F2"],
+["Claymorphism","Puffy, inflated clay shapes.","#FFE8F0","#FFFFFF","#4A2B4F","#FF8FB1","#8EC5FF","Baloo 2","Nunito",700,"--pr:32px;--br:99px;--ps:inset -6px -6px 12px rgba(0,0,0,.08),inset 6px 6px 12px #fff,8px 12px 24px rgba(255,143,177,.4)"],
+["Hand-drawn / doodle","Sketchy borders, marker type, warm paper.","#FFFDF5","#FFFFFF","#2B2B2B","#FF6B35","#3A86FF","Caveat Brush","Patrick Hand",400,"--pr:18px 4px 20px 6px;--br:10px 3px 12px 4px;--pb:2px dashed #2B2B2B"],
+["Editorial / magazine","Big serif headlines, ink and one red.","#FFFFFF","#FFFFFF","#1A1A1A","#B3001B","#6B6B6B","Playfair Display","Source Serif 4",800,"--pr:0;--br:0;--pb:0;--ps:inset 0 -3px 0 #1A1A1A"],
+["HUD / sci-fi tactical","Readouts, cut corners, amber warnings.","#05090D","#0B141B","#CFE9F2","#19E3FF","#FFB800","Michroma","Share Tech Mono",400,"--pr:4px;--br:2px;--pb:1px solid #19E3FF"]
+];
+function lum(h){var n=parseInt(h.slice(1),16),c=[n>>16&255,n>>8&255,n&255].map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function toast(m){var t=document.getElementById("toast");t.textContent=m;t.className="on";clearTimeout(toast.h);toast.h=setTimeout(function(){t.className=""},1400)}
+function cp(s,m){try{navigator.clipboard.writeText(s).then(function(){toast(m)},function(){toast("Copy blocked: select it manually")})}catch(e){toast("Copy blocked: select it manually")}}
+var g=document.getElementById("g");
+T.forEach(function(t,i){
+var n=t[0],bg=t[2],sf=t[3],tx=t[4],ac=t[5],a2=t[6],hf=t[7],bf=t[8],hw=t[9];
+var hex=bg.charAt(0)=="#";
+var cols=[["Base",bg],["Surface",sf],["Text",tx],["Accent",ac],["Accent 2",a2]];
+var c=document.createElement("article");c.className="card";
+var sw=cols.map(function(x){var v=x[1].indexOf("rgba")==0?x[1]:x[1].toUpperCase();return '<button data-v="'+v+'" aria-label="Copy '+x[0]+' '+v+'"><i style="background:'+x[1]+';'+(x[0]=="Surface"&&x[1].indexOf("rgba")==0?'background:linear-gradient(#888,#888);opacity:.6':'')+'"></i><span>'+(v.length>9?"rgba":v)+'</span></button>'}).join("");
+var abc=lum(ac)>.35?"#111":"#fff";
+c.innerHTML='<div class="stage" style="--bg:'+bg+';--sf:'+sf+';--t:'+tx+';--a:'+ac+';--b:'+a2+';--ab:'+abc+';--hf:\''+hf+'\',sans-serif;--bfm:\''+bf+'\',sans-serif;--hw:'+hw+';'+t[10]+'"><div class="pv"><h4>Morning check-in</h4><p>Log your session and keep the streak alive.</p><div class="row"><span class="btn">Start session</span><span class="chip">View plan</span></div></div></div>'+
+'<div class="meta"><h2>'+(i+1)+'. '+n+'</h2><p class="d">'+t[1]+'</p><div class="sw">'+sw+'</div><div class="f">Heading: <b>'+hf+'</b><br>Body: <b>'+bf+'</b></div><button class="cp">Copy kit as CSS</button></div>';
+c.querySelectorAll(".sw button").forEach(function(b){b.onclick=function(){cp(b.dataset.v,"Copied "+b.dataset.v)}});
+c.querySelector(".cp").onclick=function(){
+var css=":root{\n  --bg:"+bg+";\n  --surface:"+sf+";\n  --text:"+tx+";\n  --accent:"+ac+";\n  --accent-2:"+a2+";\n  --font-heading:'"+hf+"',sans-serif;\n  --font-body:'"+bf+"',sans-serif;\n}";
+cp(css,"Copied "+n+" kit")};
+g.appendChild(c)});
+</script>
+</body>
+</html>

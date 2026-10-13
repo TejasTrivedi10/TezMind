@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minimalism UI kit for mobile web apps</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#FAFAFA;--sf:#fff;--tx:#111;--mu:#767676;--ln:#EBEBEB;--bd:#D2D2D2;--ac:#111;--on:#fff;--ok:#1F7A4D;--er:#C0392B;--wn:#A86A0C;--in:#2B5FAE;--r:6px;--r2:12px;--ring:rgba(17,17,17,.14);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E0E0F;--sf:#161617;--tx:#F2F2F2;--mu:#909095;--ln:#262628;--bd:#3A3A3D;--ac:#F2F2F2;--on:#0E0E0F;--ok:#4CC38A;--er:#F07167;--wn:#E5B04B;--in:#6C9CF0;--ring:rgba(242,242,242,.18)}}
+:root[data-theme="dark"]{--bg:#0E0E0F;--sf:#161617;--tx:#F2F2F2;--mu:#909095;--ln:#262628;--bd:#3A3A3D;--ac:#F2F2F2;--on:#0E0E0F;--ok:#4CC38A;--er:#F07167;--wn:#E5B04B;--in:#6C9CF0;--ring:rgba(242,242,242,.18)}
+html{scroll-padding-top:calc(60px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 15px/1.5 Inter,system-ui,sans-serif}
+h1,h2,h3{font-family:Manrope,sans-serif;margin:0;letter-spacing:-.02em}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:8px;padding:10px 16px}
+.top nav{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+.top a{color:var(--mu);text-decoration:none;font-size:13px;font-weight:500;padding:6px 10px;border-radius:99px;white-space:nowrap}
+.top a:hover{color:var(--tx);background:var(--ln)}
+.w{max-width:960px;margin:0 auto;padding:0 16px 64px}
+.hero{padding:40px 0 8px}
+.hero h1{font-size:clamp(30px,6vw,44px);line-height:1.08;font-weight:800}
+.hero p{color:var(--mu);max-width:56ch;margin:10px 0 16px}
+section{padding-top:40px}
+section>h2{font-size:22px;font-weight:700;margin-bottom:4px}
+section>p{color:var(--mu);margin:0 0 16px;font-size:14px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.c{background:var(--sf);border:1px solid var(--ln);border-radius:var(--r2);padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.c>h3{font-size:13px;font-weight:600;color:var(--mu);font-family:Inter,sans-serif;letter-spacing:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--tx);outline-offset:2px}
+/* buttons */
+.btn{height:44px;padding:0 18px;border-radius:var(--r);border:1px solid transparent;font:600 15px Inter,sans-serif;display:inline-flex;gap:8px;align-items:center;justify-content:center;cursor:pointer;background:var(--ac);color:var(--on)}
+.btn.s{background:transparent;color:var(--tx);border-color:var(--bd)}
+.btn.t{background:transparent;color:var(--tx)}
+.btn.d{background:var(--er);color:#fff}
+.btn.sm{height:34px;padding:0 12px;font-size:13px}
+.btn.lg{height:52px;padding:0 24px;font-size:16px}
+.btn.b{width:100%}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ib{width:44px;padding:0;background:transparent;color:var(--tx);border-color:var(--bd)}
+/* fields */
+.f{display:flex;flex-direction:column;gap:6px}
+.f>label{font-size:13px;font-weight:600}
+.in,select,textarea{width:100%;height:46px;padding:0 14px;border:1px solid var(--bd);border-radius:var(--r);background:var(--sf);color:var(--tx);font:400 16px Inter,sans-serif}
+textarea{height:88px;padding:12px 14px;resize:vertical}
+.in::placeholder,textarea::placeholder{color:var(--mu)}
+.in:focus,select:focus,textarea:focus{outline:0;border-color:var(--tx);box-shadow:0 0 0 3px var(--ring)}
+.f.e .in{border-color:var(--er)}
+.h{font-size:12px;color:var(--mu)}
+.f.e .h{color:var(--er)}
+.iw{position:relative;display:flex;align-items:center}
+.iw>.i{position:absolute;left:13px;color:var(--mu);pointer-events:none}
+.iw .in{padding-left:42px}
+.iw button{position:absolute;right:4px;width:38px;height:38px;border:0;background:none;color:var(--mu);cursor:pointer}
+.iw.pw .in{padding-right:44px;padding-left:14px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23909095' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:18px;padding-right:40px}
+.otp{display:flex;gap:8px}.otp .in{width:48px;padding:0;text-align:center;font-size:20px;font-weight:600}
+/* selection */
+.ck{display:flex;gap:10px;align-items:center;font-size:15px;cursor:pointer}
+input[type=checkbox],input[type=radio]{appearance:none;margin:0;width:20px;height:20px;border:1.5px solid var(--bd);background:var(--sf);position:relative;flex:none;cursor:pointer}
+input[type=checkbox]{border-radius:5px}input[type=radio]{border-radius:50%}
+input[type=checkbox]:checked{background:var(--ac);border-color:var(--ac)}
+input[type=checkbox]:checked::after{content:"";position:absolute;left:5.5px;top:2px;width:5px;height:10px;border:solid var(--on);border-width:0 2px 2px 0;transform:rotate(45deg)}
+input[type=radio]:checked{background:var(--ac);border-color:var(--ac);box-shadow:inset 0 0 0 4px var(--sf)}
+input[role=switch]{width:46px;height:28px;border-radius:99px;background:var(--bd);border:0}
+input[role=switch]::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s}
+input[role=switch]:checked{background:var(--ac)}
+input[role=switch]:checked::after{transform:translateX(18px);background:var(--on);border:0;left:3px;top:3px;width:22px;height:22px}
+input[type=range]{width:100%;accent-color:var(--ac)}
+.seg{display:flex;background:var(--ln);border-radius:var(--r);padding:3px}
+.seg button{flex:1;border:0;background:none;height:34px;border-radius:4px;font:500 14px Inter;color:var(--mu);cursor:pointer}
+.seg button.on{background:var(--sf);color:var(--tx);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.chip{height:34px;padding:0 14px;border-radius:99px;border:1px solid var(--bd);background:none;color:var(--tx);font:500 14px Inter;cursor:pointer}
+.chip.on{background:var(--ac);color:var(--on);border-color:var(--ac)}
+.bg{display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:99px;font-size:12px;font-weight:600;background:var(--ln);color:var(--tx)}
+.bg.ok{color:var(--ok);background:color-mix(in srgb,var(--ok) 13%,transparent)}
+.bg.er{color:var(--er);background:color-mix(in srgb,var(--er) 13%,transparent)}
+.bg.wn{color:var(--wn);background:color-mix(in srgb,var(--wn) 14%,transparent)}
+.bg.in{color:var(--in);background:color-mix(in srgb,var(--in) 13%,transparent)}
+.av{width:40px;height:40px;border-radius:50%;background:var(--ln);display:grid;place-items:center;font:700 14px Manrope;position:relative;flex:none}
+.av.l{width:56px;height:56px;font-size:18px}.av.sm{width:28px;height:28px;font-size:11px}
+.av.on::after{content:"";position:absolute;right:0;bottom:0;width:11px;height:11px;border-radius:50%;background:var(--ok);border:2px solid var(--sf)}
+.stack{display:flex}.stack .av{border:2px solid var(--sf);margin-left:-10px}.stack .av:first-child{margin-left:0}
+/* feedback */
+.al{display:flex;gap:10px;padding:12px 14px;border:1px solid var(--ln);border-left:3px solid var(--c);border-radius:var(--r);font-size:14px}
+.al .i{color:var(--c);margin-top:1px}.al b{display:block;font-weight:600}.al span{color:var(--mu)}
+.pr{height:6px;border-radius:99px;background:var(--ln);overflow:hidden}.pr i{display:block;height:100%;background:var(--ac);border-radius:99px}
+.sp{width:24px;height:24px;border-radius:50%;border:2px solid var(--ln);border-top-color:var(--tx);animation:r .8s linear infinite}
+@keyframes r{to{transform:rotate(360deg)}}
+.sk{background:var(--ln);border-radius:var(--r);height:14px;animation:p 1.4s ease-in-out infinite}
+@keyframes p{50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.sp,.sk{animation:none}input[role=switch]::after{transition:none}html{scroll-behavior:auto}}
+.empty{text-align:center;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty .av{width:56px;height:56px;color:var(--mu)}.empty p{margin:0;color:var(--mu);font-size:14px;max-width:30ch}
+/* navigation + data */
+.tabs{display:flex;border-bottom:1px solid var(--ln)}
+.tabs button{flex:1;height:42px;border:0;background:none;color:var(--mu);font:500 14px Inter;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+.tabs button.on{color:var(--tx);border-color:var(--tx)}
+.pn{display:none;font-size:14px;color:var(--mu)}.pn.on{display:block}
+.cell{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--ln)}
+.cell:last-child{border:0}.cell>div{flex:1;min-width:0}.cell b{display:block;font-weight:600;font-size:15px}.cell small{color:var(--mu);font-size:13px}
+.cell>.i:last-child{color:var(--mu)}
+details{border-bottom:1px solid var(--ln)}details:last-child{border:0}
+summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 0;font-weight:600;cursor:pointer}
+summary::-webkit-details-marker{display:none}summary .i{transition:transform .15s}details[open] summary .i{transform:rotate(180deg)}
+details p{margin:0 0 14px;color:var(--mu);font-size:14px}
+.steps{display:flex;align-items:center}
+.st{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--bd);display:grid;place-items:center;font:600 13px Inter;color:var(--mu);flex:none}
+.st.dn{background:var(--ac);border-color:var(--ac);color:var(--on)}.st.on{border-color:var(--tx);color:var(--tx)}
+.ln{flex:1;height:1.5px;background:var(--bd)}.ln.dn{background:var(--ac)}
+.pg{display:flex;gap:4px;justify-content:center}.pg button{min-width:36px;height:36px;border-radius:var(--r);border:0;background:none;color:var(--tx);font:500 14px Inter;cursor:pointer}
+.pg button.on{background:var(--ac);color:var(--on)}
+.dots{display:flex;gap:6px;justify-content:center}.dots i{width:6px;height:6px;border-radius:50%;background:var(--bd)}.dots i.on{width:18px;border-radius:99px;background:var(--ac)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 8px;border-bottom:1px solid var(--ln)}
+.bar b{font:700 16px Manrope}.bar button{width:40px;height:40px;border:0;background:none;color:var(--tx);cursor:pointer;display:grid;place-items:center}
+.nav{display:flex;border-top:1px solid var(--ln);background:var(--sf)}
+.nav button{flex:1;border:0;background:none;color:var(--mu);padding:8px 0 10px;font:500 11px Inter;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.nav button.on{color:var(--tx)}
+.ph{max-width:320px;margin:0 auto;width:100%;border:1px solid var(--bd);border-radius:28px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column;min-height:560px}
+.ph .bd2{flex:1;padding:16px;display:flex;flex-direction:column;gap:12px}
+.fab{position:absolute;right:14px;bottom:70px;width:52px;height:52px;border-radius:50%;border:0;background:var(--ac);color:var(--on);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.swt{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.swt div{border:1px solid var(--ln);border-radius:var(--r);overflow:hidden;font:11px/1.35 ui-monospace,Menlo,monospace}
+.swt i{display:block;height:44px;border-bottom:1px solid var(--ln)}.swt span{display:block;padding:6px 8px;color:var(--mu)}.swt b{color:var(--tx);font-weight:600;display:block}
+.sc div{display:flex;align-items:baseline;gap:12px;padding:6px 0;border-bottom:1px solid var(--ln)}.sc small{width:84px;color:var(--mu);font-size:12px;flex:none}
+dialog{border:1px solid var(--ln);background:var(--sf);color:var(--tx);border-radius:var(--r2);padding:20px;width:min(340px,calc(100% - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h3{font-size:18px;margin-bottom:6px}dialog p{margin:0 0 16px;color:var(--mu);font-size:14px}
+dialog.sheet{margin:auto 0 0;width:100%;max-width:none;border-radius:var(--r2) var(--r2) 0 0;border-bottom:0;padding:12px 20px calc(20px + env(safe-area-inset-bottom,0px))}
+.grab{width:36px;height:4px;border-radius:99px;background:var(--bd);margin:0 auto 14px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ac);color:var(--on);padding:12px 18px;border-radius:var(--r);font-size:14px;font-weight:500;opacity:0;pointer-events:none;transition:.2s;z-index:9}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></symbol>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="heart" viewBox="0 0 24 24"><path d="M12 20s-8-5-8-11a4.5 4.5 0 018-2.8A4.5 4.5 0 0120 9c0 6-8 11-8 11z"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l2 2H4zM10 21h4"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+<symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+<symbol id="sl" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+</svg>
+
+<div class="top">
+<nav><a href="#fd">Foundations</a><a href="#bt">Buttons</a><a href="#fm">Forms</a><a href="#sel">Selection</a><a href="#fb">Feedback</a><a href="#nv">Navigation</a><a href="#ov">Overlays</a><a href="#sc">Screen</a></nav>
+<button class="btn s sm" id="th" aria-label="Toggle theme">Theme</button>
+</div>
+
+<div class="w">
+<div class="hero"><h1>Minimalism UI kit</h1><p>Mobile web components with one accent, hairline borders and generous space. Manrope for headings, Inter for text. Everything below is interactive and follows light and dark mode.</p><button class="btn" id="cpt">Copy design tokens</button></div>
+
+<section id="fd"><h2>Foundations</h2><p>Color, type, spacing and radius tokens.</p>
+<div class="g">
+<div class="c"><h3>Color</h3><div class="swt">
+<div><i style="background:var(--bg)"></i><span><b>Base</b>#FAFAFA</span></div>
+<div><i style="background:var(--sf)"></i><span><b>Surface</b>#FFFFFF</span></div>
+<div><i style="background:var(--tx)"></i><span><b>Ink</b>#111111</span></div>
+<div><i style="background:var(--mu)"></i><span><b>Muted</b>#767676</span></div>
+<div><i style="background:var(--bd)"></i><span><b>Border</b>#D2D2D2</span></div>
+<div><i style="background:var(--ok)"></i><span><b>Success</b>#1F7A4D</span></div>
+<div><i style="background:var(--er)"></i><span><b>Error</b>#C0392B</span></div>
+<div><i style="background:var(--wn)"></i><span><b>Warning</b>#A86A0C</span></div>
+<div><i style="background:var(--in)"></i><span><b>Info</b>#2B5FAE</span></div>
+</div></div>
+<div class="c sc"><h3>Type scale</h3>
+<div><small>Display 32</small><span style="font:800 32px/1.1 Manrope;letter-spacing:-.02em">Plan your week</span></div>
+<div><small>Title 24</small><span style="font:700 24px/1.2 Manrope">Account settings</span></div>
+<div><small>Heading 18</small><span style="font:700 18px Manrope">Recent activity</span></div>
+<div><small>Body 15</small><span>Readable text for forms and lists.</span></div>
+<div><small>Small 13</small><span style="font-size:13px;color:var(--mu)">Helper and secondary text</span></div>
+<div><small>Caption 12</small><span style="font-size:12px;color:var(--mu)">Timestamps and hints</span></div>
+</div>
+<div class="c"><h3>Spacing (4px base)</h3>
+<div class="row" style="align-items:flex-end;gap:12px"><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:4px;height:4px;background:var(--tx);margin:0 auto 4px"></div>4</div><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:8px;height:8px;background:var(--tx);margin:0 auto 4px"></div>8</div><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:12px;height:12px;background:var(--tx);margin:0 auto 4px"></div>12</div><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:16px;height:16px;background:var(--tx);margin:0 auto 4px"></div>16</div><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:24px;height:24px;background:var(--tx);margin:0 auto 4px"></div>24</div><div style="text-align:center;font-size:11px;color:var(--mu)"><div style="width:32px;height:32px;background:var(--tx);margin:0 auto 4px"></div>32</div></div>
+<h3 style="margin-top:8px">Radius</h3>
+<div class="row"><div style="width:56px;height:56px;border:1.5px solid var(--tx);border-radius:6px;display:grid;place-items:center;font-size:12px">6</div><div style="width:56px;height:56px;border:1.5px solid var(--tx);border-radius:12px;display:grid;place-items:center;font-size:12px">12</div><div style="width:56px;height:56px;border:1.5px solid var(--tx);border-radius:99px;display:grid;place-items:center;font-size:12px">full</div></div>
+<p class="h">Controls are 6px, cards and sheets 12px, pills and avatars full. Touch targets are at least 44px.</p></div>
+</div></section>
+
+<section id="bt"><h2>Buttons</h2><p>One primary action per screen.</p>
+<div class="g">
+<div class="c"><h3>Variants</h3><div class="row"><button class="btn">Save changes</button><button class="btn s">Cancel</button><button class="btn t">Skip</button><button class="btn d">Delete account</button></div></div>
+<div class="c"><h3>Sizes and states</h3><div class="row"><button class="btn sm">Small</button><button class="btn">Default</button><button class="btn lg">Large</button><button class="btn" disabled>Disabled</button></div></div>
+<div class="c"><h3>Icon and full width</h3><div class="row"><button class="btn ib" aria-label="Add"><svg class="i"><use href="#plus"/></svg></button><button class="btn ib" aria-label="Notifications"><svg class="i"><use href="#bell"/></svg></button><button class="btn s"><svg class="i"><use href="#mail"/></svg>Email me</button></div><button class="btn b">Continue</button><button class="btn b" id="ld"><span class="sp" style="width:18px;height:18px;border-color:#888;border-top-color:var(--on)"></span>Saving</button></div>
+</div></section>
+
+<section id="fm"><h2>Forms</h2><p>Labels above fields, 16px text to prevent zoom on iOS.</p>
+<div class="g">
+<div class="c"><div class="f"><label for="a1">Full name</label><input class="in" id="a1" placeholder="Ada Lovelace" autocomplete="name"><span class="h">As it appears on your ID.</span></div>
+<div class="f e"><label for="a2">Email</label><div class="iw"><svg class="i"><use href="#mail"/></svg><input class="in" id="a2" value="ada@" type="email"></div><span class="h">Enter a full email address, like ada@example.com.</span></div>
+<div class="f"><label for="a3">Password</label><div class="iw pw"><input class="in" id="a3" type="password" value="secret123"><button aria-label="Show password" id="pwb"><svg class="i"><use href="#eye"/></svg></button></div></div></div>
+<div class="c"><div class="f"><label for="a4">Search</label><div class="iw"><svg class="i"><use href="#search"/></svg><input class="in" id="a4" type="search" placeholder="Search projects"></div></div>
+<div class="f"><label for="a5">Country</label><select id="a5"><option>India</option><option>United States</option><option>Germany</option></select></div>
+<div class="f"><label for="a6">Message</label><textarea id="a6" placeholder="Tell us what happened"></textarea></div></div>
+<div class="c"><div class="f"><label>Verification code</label><div class="otp"><input class="in" maxlength="1" inputmode="numeric" aria-label="Digit 1"><input class="in" maxlength="1" inputmode="numeric" aria-label="Digit 2"><input class="in" maxlength="1" inputmode="numeric" aria-label="Digit 3"><input class="in" maxlength="1" inputmode="numeric" aria-label="Digit 4"></div><span class="h">We sent a 4-digit code to your phone.</span></div>
+<div class="f"><label for="a7">Disabled</label><input class="in" id="a7" value="Locked field" disabled style="opacity:.5"></div>
+<button class="btn b">Verify code</button></div>
+</div></section>
+
+<section id="sel"><h2>Selection and display</h2><p>Checkboxes, radios, switches, sliders, segments, chips, badges and avatars.</p>
+<div class="g">
+<div class="c"><h3>Checkbox and radio</h3><label class="ck"><input type="checkbox" checked>Email me product updates</label><label class="ck"><input type="checkbox">Share usage data</label><label class="ck"><input type="radio" name="p" checked>Monthly billing</label><label class="ck"><input type="radio" name="p">Yearly billing</label></div>
+<div class="c"><h3>Switch and slider</h3><label class="ck" style="justify-content:space-between">Push notifications<input type="checkbox" role="switch" checked></label><label class="ck" style="justify-content:space-between">Dark mode<input type="checkbox" role="switch"></label><div class="f"><label for="rg">Volume: <span id="rv">40</span></label><input type="range" id="rg" value="40"></div></div>
+<div class="c"><h3>Segmented and chips</h3><div class="seg"><button class="on">Day</button><button>Week</button><button>Month</button></div><div class="row"><button class="chip on">All</button><button class="chip">Design</button><button class="chip">Code</button><button class="chip">Writing</button></div></div>
+<div class="c"><h3>Badges</h3><div class="row"><span class="bg">Draft</span><span class="bg ok">Paid</span><span class="bg wn">Pending</span><span class="bg er">Failed</span><span class="bg in">New</span></div><h3>Avatars</h3><div class="row"><div class="av sm">AL</div><div class="av on">KM</div><div class="av l">RS</div><div class="stack"><div class="av">AB</div><div class="av">CD</div><div class="av">EF</div><div class="av">+3</div></div></div></div>
+</div></section>
+
+<section id="fb"><h2>Feedback</h2><p>Alerts, progress, loading and empty states.</p>
+<div class="g">
+<div class="c"><h3>Alerts</h3>
+<div class="al" style="--c:var(--ok)"><svg class="i"><use href="#check"/></svg><div><b>Profile saved</b><span>Your changes are live.</span></div></div>
+<div class="al" style="--c:var(--er)"><svg class="i"><use href="#info"/></svg><div><b>Payment failed</b><span>Check your card details and try again.</span></div></div>
+<div class="al" style="--c:var(--wn)"><svg class="i"><use href="#info"/></svg><div><b>Storage almost full</b><span>You have used 92% of your space.</span></div></div>
+<div class="al" style="--c:var(--in)"><svg class="i"><use href="#info"/></svg><div><b>Update available</b><span>Reload to get version 2.4.</span></div></div></div>
+<div class="c"><h3>Progress and loading</h3><div class="f"><label>Upload 68%</label><div class="pr"><i style="width:68%"></i></div></div><div class="row"><div class="sp"></div><span class="h">Loading your feed</span></div>
+<h3>Skeleton</h3><div class="row" style="flex-wrap:nowrap"><div class="av sk" style="border-radius:50%"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px"><div class="sk" style="width:70%"></div><div class="sk" style="width:45%"></div></div></div><button class="btn s" id="tb">Show toast</button></div>
+<div class="c"><h3>Empty state</h3><div class="empty"><div class="av"><svg class="i"><use href="#search"/></svg></div><b>No results</b><p>Try a different keyword or clear your filters.</p><button class="btn sm">Clear filters</button></div></div>
+</div></section>
+
+<section id="nv"><h2>Navigation and lists</h2><p>Tabs, list cells, accordion, steps, pagination.</p>
+<div class="g">
+<div class="c"><h3>Tabs</h3><div class="tabs"><button class="on" data-p="p1">Overview</button><button data-p="p2">Activity</button><button data-p="p3">Files</button></div><div class="pn on" id="p1">Your account is in good standing.</div><div class="pn" id="p2">3 sign-ins this week.</div><div class="pn" id="p3">12 files, 48 MB used.</div>
+<h3>Steps</h3><div class="steps"><div class="st dn"><svg class="i" style="width:14px;height:14px;stroke-width:2.5"><use href="#check"/></svg></div><div class="ln dn"></div><div class="st on">2</div><div class="ln"></div><div class="st">3</div></div>
+<div class="dots"><i></i><i class="on"></i><i></i><i></i></div></div>
+<div class="c"><h3>List cells</h3><div><div class="cell"><div class="av">AL</div><div><b>Ada Lovelace</b><small>Sent a file</small></div><svg class="i"><use href="#chev"/></svg></div><div class="cell"><svg class="i"><use href="#bell"/></svg><div><b>Notifications</b><small>Sounds and badges</small></div><svg class="i"><use href="#chev"/></svg></div><div class="cell"><svg class="i"><use href="#sl"/></svg><div><b>Preferences</b><small>Language, region</small></div><span class="bg ok">On</span></div></div></div>
+<div class="c"><h3>Accordion</h3><div><details open><summary>How do refunds work?<svg class="i"><use href="#down"/></svg></summary><p>Refunds reach your card within 5 business days.</p></details><details><summary>Can I change my plan?<svg class="i"><use href="#down"/></svg></summary><p>Yes, upgrade or downgrade any time from Settings.</p></details></div><h3>Pagination</h3><div class="pg"><button aria-label="Previous"><svg class="i"><use href="#back"/></svg></button><button class="on">1</button><button>2</button><button>3</button><button aria-label="Next"><svg class="i"><use href="#chev"/></svg></button></div></div>
+</div></section>
+
+<section id="ov"><h2>Overlays</h2><p>Modal dialog, bottom sheet and toast.</p>
+<div class="g"><div class="c"><h3>Try them</h3><div class="row"><button class="btn" data-o="dm">Open modal</button><button class="btn s" data-o="ds">Open bottom sheet</button><button class="btn s" id="tb2">Show toast</button></div></div></div></section>
+
+<section id="sc"><h2>Composed screen</h2><p>App bar, search, list, floating action button and bottom navigation together.</p>
+<div class="ph" style="position:relative"><div class="bar"><button aria-label="Menu"><svg class="i"><use href="#sl"/></svg></button><b>Inbox</b><button aria-label="Notifications"><svg class="i"><use href="#bell"/></svg></button></div>
+<div class="bd2"><div class="iw"><svg class="i"><use href="#search"/></svg><input class="in" placeholder="Search messages" aria-label="Search messages"></div>
+<div class="row"><button class="chip on">All</button><button class="chip">Unread</button><button class="chip">Starred</button></div>
+<div><div class="cell"><div class="av on">AL</div><div><b>Ada Lovelace</b><small>The draft is ready for review</small></div><small>9:41</small></div><div class="cell"><div class="av">KM</div><div><b>Kiran Mehta</b><small>Lunch on Thursday?</small></div><small>Mon</small></div><div class="cell"><div class="av">RS</div><div><b>Rhea Shah</b><small>Invoice paid, thank you</small></div><span class="bg ok">Paid</span></div></div></div>
+<button class="fab" aria-label="New message"><svg class="i"><use href="#plus"/></svg></button>
+<div class="nav"><button class="on"><svg class="i"><use href="#home"/></svg>Home</button><button><svg class="i"><use href="#search"/></svg>Explore</button><button><svg class="i"><use href="#heart"/></svg>Saved</button><button><svg class="i"><use href="#user"/></svg>Profile</button></div></div></section>
+</div>
+
+<dialog id="dm"><h3>Delete this project?</h3><p>This removes all files and cannot be undone.</p><div class="row" style="justify-content:flex-end"><button class="btn s" data-x>Keep project</button><button class="btn d" data-x>Delete project</button></div></dialog>
+<dialog id="ds" class="sheet"><div class="grab"></div><h3>Share project</h3><p>Choose how you want to send it.</p><div class="cell"><svg class="i"><use href="#mail"/></svg><div><b>Email</b></div><svg class="i"><use href="#chev"/></svg></div><div class="cell"><svg class="i"><use href="#user"/></svg><div><b>Invite a teammate</b></div><svg class="i"><use href="#chev"/></svg></div><button class="btn s b" data-x style="margin-top:12px">Cancel</button></dialog>
+<div id="toast" role="status">Changes saved</div>
+
+<script>
+var $=function(s,c){return(c||document).querySelector(s)},$$=function(s,c){return[].slice.call((c||document).querySelectorAll(s))};
+function toast(m){var t=$("#toast");t.textContent=m||"Changes saved";t.className="on";clearTimeout(toast.h);toast.h=setTimeout(function(){t.className=""},1800)}
+$("#th").onclick=function(){var r=document.documentElement,d=r.dataset.theme?r.dataset.theme=="dark":matchMedia("(prefers-color-scheme:dark)").matches;r.dataset.theme=d?"light":"dark"};
+$$(".seg").forEach(function(s){s.onclick=function(e){if(e.target.tagName=="BUTTON"){$$("button",s).forEach(function(b){b.classList.remove("on")});e.target.classList.add("on")}}});
+$$(".chip").forEach(function(c){c.onclick=function(){c.classList.toggle("on")}});
+$$(".tabs").forEach(function(t){t.onclick=function(e){var p=e.target.dataset.p;if(!p)return;$$("button",t).forEach(function(b){b.classList.remove("on")});e.target.classList.add("on");$$(".pn",t.parentNode).forEach(function(n){n.classList.toggle("on",n.id==p)})}});
+$$(".nav").forEach(function(n){n.onclick=function(e){var b=e.target.closest("button");if(!b)return;$$("button",n).forEach(function(x){x.classList.remove("on")});b.classList.add("on")}});
+$("#rg").oninput=function(){$("#rv").textContent=this.value};
+$("#pwb").onclick=function(){var i=$("#a3");i.type=i.type=="password"?"text":"password"};
+$$(".otp .in").forEach(function(i,k,a){i.oninput=function(){if(i.value&&a[k+1])a[k+1].focus()};i.onkeydown=function(e){if(e.key=="Backspace"&&!i.value&&a[k-1])a[k-1].focus()}});
+$("#tb").onclick=$("#tb2").onclick=function(){toast("Changes saved")};
+$$("[data-o]").forEach(function(b){b.onclick=function(){$("#"+b.dataset.o).showModal()}});
+$$("dialog").forEach(function(d){d.onclick=function(e){if(e.target==d||e.target.hasAttribute("data-x"))d.close()}});
+$("#cpt").onclick=function(){var css=":root{\n  --bg:#FAFAFA;--surface:#FFFFFF;--ink:#111111;--muted:#767676;--border:#D2D2D2;--hairline:#EBEBEB;\n  --success:#1F7A4D;--error:#C0392B;--warning:#A86A0C;--info:#2B5FAE;\n  --radius:6px;--radius-lg:12px;--space:4px;\n  --font-heading:'Manrope',sans-serif;--font-body:'Inter',sans-serif;\n}";try{navigator.clipboard.writeText(css).then(function(){toast("Tokens copied")},function(){toast("Copy blocked by browser")})}catch(e){toast("Copy blocked by browser")}};
+</script>
+</body>
+</html>

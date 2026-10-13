@@ -146,6 +146,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
     await db.projects.delete(id);
     await db.screens.where('projectId').equals(id).delete();
     await db.history.where('projectId').equals(id).delete();
+    await db.screenActions.where('projectId').equals(id).delete();
     set((state) => ({ projects: state.projects.filter((p) => p.id !== id) }));
   },
 

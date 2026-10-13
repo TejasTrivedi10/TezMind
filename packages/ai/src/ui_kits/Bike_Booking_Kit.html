@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>E-Bike Booking UI Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF2F0;--sf:#fff;--ink:#0E1F19;--mute:#64766F;--line:#D9E1DD;--p:#00A676;--pi:#fff;--tn:#D3F3E7;--ti:#00573D;--amb:#FFB400;--red:#E5484D;--in:#E8EEEB;--map:#DDE8E2;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1411;--sf:#15221D;--ink:#E8F3EE;--mute:#8FA59C;--line:#26362F;--p:#2FD39B;--pi:#04271B;--tn:#12372B;--ti:#B5F3DC;--in:#1D2D26;--map:#1A2A24}}
+:root[data-theme="dark"]{--bg:#0B1411;--sf:#15221D;--ink:#E8F3EE;--mute:#8FA59C;--line:#26362F;--p:#2FD39B;--pi:#04271B;--tn:#12372B;--ti:#B5F3DC;--in:#1D2D26;--map:#1A2A24}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 Outfit,system-ui,sans-serif}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:30px;margin:0 0 4px;letter-spacing:-.02em;font-weight:800}
+.sub{color:var(--mute);margin:0 0 12px}
+h2{font-size:19px;margin:36px 0 4px;font-weight:700}
+.note{color:var(--mute);font-size:13px;margin:0 0 12px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.panel{background:var(--sf);border:1px solid var(--line);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tag{font-size:12px;color:var(--mute);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.sp{justify-content:space-between}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;cursor:pointer;border:0;color:inherit;background:none}
+:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.theme{float:right;border:1px solid var(--line);background:var(--sf);border-radius:99px;padding:8px 14px;font-size:13px}
+.meta{font-size:12px;color:var(--mute)}
+
+/* INPUTS */
+.field{display:flex;align-items:center;gap:10px;height:54px;border:1.5px solid var(--line);border-radius:16px;padding:0 14px;background:var(--sf);color:var(--mute)}
+.field:focus-within{border-color:var(--p);box-shadow:0 0 0 3px color-mix(in srgb,var(--p) 25%,transparent)}
+.field input,.field select{flex:1;min-width:0;border:0;background:none;font:inherit;color:var(--ink);outline:0}
+.route{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--in);padding:10px 12px 10px 38px;border-radius:18px}
+.route::before{content:"";position:absolute;left:19px;top:28px;bottom:28px;border-left:2px dashed var(--mute)}
+.route .dot{position:absolute;left:13px;width:12px;height:12px;border-radius:50%}
+.route input{height:42px;border:0;background:var(--sf);border-radius:12px;padding:0 12px;font:inherit;color:var(--ink);width:100%;outline:0}
+.route .d1{top:24px;background:var(--p)}.route .d2{bottom:24px;border-radius:3px;background:var(--ink)}
+.promo{display:flex;border:1.5px dashed var(--p);border-radius:16px;padding:4px;background:var(--tn)}
+.promo input{flex:1;border:0;background:none;padding:0 12px;font:700 15px Outfit;letter-spacing:.08em;color:var(--ti);outline:0;min-width:0;text-transform:uppercase}
+.err{border-color:var(--red)}
+.stepper{display:flex;align-items:center;justify-content:space-between;background:var(--in);border-radius:16px;padding:6px}
+.stepper b{font-size:20px}.stepper small{display:block;color:var(--mute);font-weight:400;font-size:12px;text-align:center}
+.stepper button{width:44px;height:44px;border-radius:12px;background:var(--sf);font-size:22px;font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.unlock{display:flex;gap:8px}.unlock input{width:100%;height:60px;text-align:center;font:800 24px Outfit;border:1.5px solid var(--line);border-radius:16px;background:var(--sf);color:var(--ink);outline:0}
+.unlock input:focus{border-color:var(--p)}
+
+/* BUTTONS */
+.btn{height:50px;padding:0 24px;border-radius:16px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.fill{background:var(--p);color:var(--pi)}
+.tonal{background:var(--tn);color:var(--ti)}
+.out{border:1.5px solid var(--p);color:var(--p)}
+.dark{background:var(--ink);color:var(--bg)}
+.warn{background:var(--amb);color:#2B1E00}
+.danger{background:var(--red);color:#fff}
+.pill{border-radius:99px}
+.block{width:100%}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.ibtn{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--sf);border:1px solid var(--line)}
+.seg{display:flex;background:var(--in);border-radius:16px;padding:4px}
+.seg button{flex:1;padding:10px 4px;border-radius:12px;font-weight:500;color:var(--mute)}
+.seg button.on{background:var(--sf);color:var(--ink);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.chip{height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--sf);display:inline-flex;align-items:center;gap:6px;font-size:14px}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.slide{position:relative;height:60px;border-radius:30px;background:var(--p);color:var(--pi);display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;touch-action:none;user-select:none}
+.slide .knob{position:absolute;left:5px;top:5px;width:50px;height:50px;border-radius:50%;background:var(--pi);color:var(--p);display:grid;place-items:center;cursor:grab}
+.slide .txt{padding-left:30px;transition:opacity .1s}
+.slide.done{background:var(--ink);color:var(--bg)}
+
+/* FAB */
+.stage{position:relative;height:150px;border-radius:18px;overflow:hidden;background:var(--map);
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:36px 36px}
+.fab{position:absolute;width:58px;height:58px;border-radius:20px;background:var(--p);color:var(--pi);display:grid;place-items:center;box-shadow:0 8px 18px rgba(0,166,118,.4)}
+.fab.r{right:16px;bottom:16px}
+.fab.round{border-radius:50%}
+.fab.sm{width:44px;height:44px;border-radius:14px;background:var(--sf);color:var(--ink);box-shadow:0 3px 10px rgba(0,0,0,.2);right:23px;bottom:84px}
+.fab.ext{width:auto;padding:0 22px 0 18px;display:flex;gap:10px;font-weight:700;left:50%;transform:translateX(-50%);bottom:16px;border-radius:30px;height:56px;background:var(--ink);color:var(--bg);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.pin{position:absolute;display:flex;flex-direction:column;align-items:center}
+.pin b{background:var(--ink);color:var(--bg);border-radius:12px;padding:3px 8px;font-size:12px}
+.pin i{width:14px;height:14px;border-radius:50%;background:var(--p);border:3px solid var(--sf);margin-top:3px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.pin.low i{background:var(--amb)}.pin.off i{background:var(--mute)}
+.me{position:absolute;width:18px;height:18px;border-radius:50%;background:#2F7BFF;border:3px solid #fff;box-shadow:0 0 0 10px rgba(47,123,255,.2)}
+
+/* BATTERY */
+.bat{display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:13px}
+.bat i{width:30px;height:14px;border:2px solid currentColor;border-radius:4px;position:relative;padding:1px}
+.bat i::after{content:"";position:absolute;right:-5px;top:3px;width:3px;height:4px;background:currentColor;border-radius:0 2px 2px 0}
+.bat i s{display:block;height:100%;background:currentColor;border-radius:1px}
+.hi{color:var(--p)}.mid{color:#C98A00}.lo{color:var(--red)}
+
+/* TILES */
+.tile{display:flex;gap:12px;align-items:center;padding:10px 6px;border-radius:16px;width:100%;text-align:left}
+.tile:hover{background:var(--in)}
+.ic{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:var(--tn);color:var(--ti);flex:none}
+.ic.dk{background:var(--ink);color:var(--bg)}.ic.am{background:#FFF1CC;color:#7A5500}
+.tm{flex:1;min-width:0}.tn{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ts{color:var(--mute);font-size:13px}
+.price{font-weight:800}
+.radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none}
+.sel .radio{border:7px solid var(--p)}.sel{background:var(--tn)}
+.tag-s{font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px;background:var(--tn);color:var(--ti)}
+.tag-s.a{background:#FFF1CC;color:#7A5500}.tag-s.g{background:var(--in);color:var(--mute)}
+
+/* CARDS */
+.card{border:1px solid var(--line);border-radius:22px;padding:14px;background:var(--sf);display:flex;flex-direction:column;gap:10px}
+.bike svg.art{width:100%;height:96px;color:var(--ink);background:var(--in);border-radius:16px}
+.specs{display:flex;gap:6px;flex-wrap:wrap}
+.live{background:var(--ink);color:var(--bg);border:0}
+.live .big{font:800 34px/1 Outfit;font-variant-numeric:tabular-nums}
+.live .meta{color:var(--mute)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:rgba(255,255,255,.08);border-radius:14px;padding:8px;text-align:center}
+.stats b{display:block;font-size:17px}
+.pass{background:linear-gradient(135deg,#00A676,#0B6E57);color:#fff;border:0}
+.pass .meta{color:#CDEFE3}
+.wallet{background:var(--tn);color:var(--ti);border:0}
+.wallet .amt{font:800 32px/1 Outfit}
+.sum .ln{display:flex;justify-content:space-between}
+.sum .tot{border-top:1px dashed var(--line);padding-top:10px;font-weight:800;font-size:17px}
+.qr{width:120px;height:120px;border-radius:16px;margin:auto;background:
+conic-gradient(var(--ink) 25%,var(--sf) 0 50%,var(--ink) 0 75%,var(--sf) 0) 0 0/20px 20px;border:8px solid var(--sf);outline:2px solid var(--ink)}
+.stars{color:var(--amb);letter-spacing:2px;font-size:22px}
+.steps{display:flex;align-items:center}
+.steps .s{width:28px;height:28px;border-radius:50%;background:var(--in);color:var(--mute);display:grid;place-items:center;font-size:13px;font-weight:700;flex:none}
+.steps .s.on{background:var(--p);color:var(--pi)}
+.steps .l{flex:1;height:3px;background:var(--in)}.steps .l.on{background:var(--p)}
+.empty{text-align:center;color:var(--mute);border-style:dashed;align-items:center}
+
+/* SHEET / NAV / TOAST */
+.sheet{background:var(--sf);border:1px solid var(--line);border-radius:28px 28px 20px 20px;padding:8px 16px 16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 -8px 24px rgba(0,0,0,.08)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);align-self:center}
+.appbar{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:18px;background:var(--sf);border:1px solid var(--line)}
+.appbar .t{flex:1;font-weight:700;font-size:17px}
+.nav{display:flex;background:var(--ink);border-radius:24px;padding:6px}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0;border-radius:18px;font-size:12px;color:var(--mute)}
+.nav button.on{background:var(--p);color:var(--pi);font-weight:700}
+.toast{background:var(--ink);color:var(--bg);border-radius:14px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.toast button{color:var(--p);font-weight:700}
+.alert{border-radius:16px;padding:12px 14px;display:flex;gap:10px;background:#FFF1CC;color:#5C4100}
+.tog{width:52px;height:30px;border-radius:15px;background:var(--line);position:relative;transition:.2s;flex:none}
+.tog::after{content:"";position:absolute;top:4px;left:4px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}
+.tog.on{background:var(--p)}.tog.on::after{left:26px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+<symbol id="loc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></symbol>
+<symbol id="qr" viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3M7 12h10"/></symbol>
+<symbol id="bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></symbol>
+<symbol id="card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/></symbol>
+<symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="back" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+<symbol id="map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14"/></symbol>
+<symbol id="bike" viewBox="0 0 24 24"><circle cx="5.5" cy="17" r="3.5"/><circle cx="18.5" cy="17" r="3.5"/><path d="M5.5 17 9 8h5l4.5 9M9 8 7.5 5H6M14 8l-3 9h-5.5M14 5h3"/></symbol>
+<symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+</defs></svg>
+
+<div class="wrap">
+<button class="theme" onclick="tt()">Toggle theme</button>
+<h1>E-bike booking UI kit</h1>
+<p class="sub">Find, reserve, unlock and pay for an e-bike. Plain HTML and CSS; the script only powers the demos.</p>
+
+<h2>Inputs</h2>
+<p class="note">Large 54px fields, 16px radius. Booking-specific inputs: route, time, duration, promo and unlock code.</p>
+<div class="grid">
+ <div class="panel"><span class="tag">Pickup and drop-off</span>
+  <div class="route"><i class="dot d1"></i><i class="dot d2"></i><input placeholder="Pickup station" value="MG Road Station"><input placeholder="Where to?"></div>
+  <span class="tag">Date and time</span>
+  <div class="row" style="flex-wrap:nowrap"><label class="field" style="flex:1"><svg class="i"><use href="#cal"/></svg><input type="date"></label><label class="field" style="flex:1"><svg class="i"><use href="#clock"/></svg><input type="time"></label></div>
+ </div>
+ <div class="panel"><span class="tag">Duration stepper</span>
+  <div class="stepper"><button onclick="st(-1)" aria-label="Less">−</button><div><b id="hr">2 hours</b><small>Est. 28 km range</small></div><button onclick="st(1)" aria-label="More">+</button></div>
+  <span class="tag">Promo code</span>
+  <div class="promo"><input value="RIDE50" aria-label="Promo code"><button class="btn fill" style="height:42px;border-radius:12px">Apply</button></div>
+  <span class="tag">Error state</span>
+  <label class="field err"><svg class="i"><use href="#pin"/></svg><input value="Unknown station"></label>
+  <span class="meta" style="color:var(--red);margin-top:-8px">No stations found. Try a nearby landmark.</span>
+ </div>
+ <div class="panel"><span class="tag">Bike unlock code</span>
+  <div class="unlock"><input maxlength="1" value="4"><input maxlength="1" value="2"><input maxlength="1"><input maxlength="1"></div>
+  <span class="tag">Search</span>
+  <label class="field" style="border-radius:99px"><svg class="i"><use href="#pin"/></svg><input placeholder="Search stations nearby"></label>
+  <span class="tag">Select</span>
+  <label class="field"><svg class="i"><use href="#bike"/></svg><select><option>City cruiser</option><option>Mountain</option><option>Cargo</option></select></label>
+ </div>
+</div>
+
+<h2>Buttons</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Primary, tonal, outlined, dark, warning</span>
+  <div class="row"><button class="btn fill">Book bike</button><button class="btn tonal">Reserve 10 min</button><button class="btn out">Directions</button></div>
+  <div class="row"><button class="btn dark"><svg class="i"><use href="#qr"/></svg>Scan to unlock</button><button class="btn warn"><svg class="i"><use href="#bolt"/></svg>Low battery</button><button class="btn danger">Report issue</button></div>
+  <button class="btn fill block">Confirm and pay ₹149</button>
+  <button class="btn fill block" disabled>Select a bike</button>
+ </div>
+ <div class="panel"><span class="tag">Slide to unlock (drag the knob)</span>
+  <div class="slide" id="sl"><div class="knob" id="kn"><svg class="i"><use href="#arrow"/></svg></div><span class="txt" id="sx">Slide to unlock</span></div>
+  <span class="tag">Segmented: ride type</span>
+  <div class="seg" id="sg"><button class="on">Hourly</button><button>Daily</button><button>Monthly</button></div>
+  <span class="tag">Filter chips</span>
+  <div class="row" id="ch"><button class="chip on"><svg class="i" style="width:16px;height:16px"><use href="#bolt"/></svg>Charged</button><button class="chip">Cruiser</button><button class="chip">Cargo</button><button class="chip">Under ₹5/min</button></div>
+  <span class="tag">Round icon buttons</span>
+  <div class="row"><button class="ibtn" aria-label="Locate"><svg class="i"><use href="#loc"/></svg></button><button class="ibtn" aria-label="Map"><svg class="i"><use href="#map"/></svg></button><button class="ibtn" aria-label="Lock"><svg class="i"><use href="#lock"/></svg></button></div>
+ </div>
+</div>
+
+<h2>FAB and map markers</h2>
+<p class="note">On the map screen the FABs are "locate me" and "scan to ride".</p>
+<div class="grid">
+ <div class="panel"><span class="tag">Locate FAB, small FAB, markers by battery level</span>
+  <div class="stage" style="height:200px">
+   <div class="pin" style="left:20%;top:22%"><b>12 bikes</b><i></i></div>
+   <div class="pin low" style="left:55%;top:40%"><b>2 bikes</b><i></i></div>
+   <div class="pin off" style="left:35%;top:68%"><b>Empty</b><i></i></div>
+   <div class="me" style="left:46%;top:62%"></div>
+   <button class="fab sm" style="bottom:84px" aria-label="Layers"><svg class="i"><use href="#map"/></svg></button>
+   <button class="fab r" aria-label="Locate me"><svg class="i"><use href="#loc"/></svg></button>
+  </div>
+ </div>
+ <div class="panel"><span class="tag">Extended FAB, centered</span>
+  <div class="stage"><button class="fab ext"><svg class="i"><use href="#qr"/></svg>Scan to ride</button></div>
+  <span class="tag">Circle FAB</span>
+  <div class="stage" style="height:100px"><button class="fab r round" style="bottom:20px"><svg class="i"><use href="#bolt"/></svg></button></div>
+ </div>
+</div>
+
+<h2>List tiles</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Nearby stations</span>
+  <button class="tile"><span class="ic"><svg class="i"><use href="#pin"/></svg></span><span class="tm"><span class="tn">MG Road Station</span><span class="ts">120 m · 8 bikes</span></span><span class="tag-s">Open</span></button>
+  <button class="tile"><span class="ic am"><svg class="i"><use href="#pin"/></svg></span><span class="tm"><span class="tn">Lake View Dock</span><span class="ts">450 m · 2 bikes</span></span><span class="tag-s a">Low</span></button>
+  <button class="tile"><span class="ic dk"><svg class="i"><use href="#pin"/></svg></span><span class="tm"><span class="tn">City Mall</span><span class="ts">1.2 km · 0 bikes</span></span><span class="tag-s g">Empty</span></button>
+ </div>
+ <div class="panel"><span class="tag">Payment method (selectable)</span>
+  <button class="tile sel"><span class="ic"><svg class="i"><use href="#wallet"/></svg></span><span class="tm"><span class="tn">Ride wallet</span><span class="ts">Balance ₹320</span></span><i class="radio"></i></button>
+  <button class="tile"><span class="ic dk"><svg class="i"><use href="#card"/></svg></span><span class="tm"><span class="tn">Visa ending 4821</span><span class="ts">Expires 08/28</span></span><i class="radio"></i></button>
+  <span class="tag">Ride history</span>
+  <button class="tile"><span class="ic"><svg class="i"><use href="#bike"/></svg></span><span class="tm"><span class="tn">MG Road → Lake View</span><span class="ts">8 Oct · 6.4 km · 24 min</span></span><span class="price">₹68</span></button>
+  <span class="tag">Setting tile</span>
+  <div class="tile"><span class="ic"><svg class="i"><use href="#bolt"/></svg></span><span class="tm"><span class="tn">Low battery alerts</span><span class="ts">Warn me at 20%</span></span><button class="tog on" aria-label="Toggle" onclick="this.classList.toggle('on')"></button></div>
+ </div>
+</div>
+
+<h2>Cards</h2>
+<div class="grid">
+ <div class="card bike"><svg class="art" viewBox="0 0 200 96"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="55" cy="62" r="19"/><circle cx="145" cy="62" r="19"/><path d="M55 62 85 32h38l22 30M85 32l-6-10H68M123 32l-24 30H55M120 22h14"/></g><rect x="84" y="40" width="24" height="9" rx="3" fill="#00A676"/></svg>
+  <div class="row sp"><b style="font-size:17px">City Cruiser X2</b><span class="price">₹4<small class="ts">/min</small></span></div>
+  <div class="specs"><span class="bat hi"><i><s style="width:86%"></s></i>86%</span><span class="tag-s">32 km range</span><span class="tag-s g">25 km/h</span></div>
+  <div class="row"><button class="btn fill" style="flex:1">Book now</button><button class="btn tonal">Reserve</button></div></div>
+ <div class="card live"><div class="row sp"><span class="tag-s">Ride in progress</span><span class="bat mid" style="color:var(--amb)"><i><s style="width:54%"></s></i>54%</span></div>
+  <div class="big">00:18:42</div><span class="meta">Started 9:41 AM · Bike #E-2048</span>
+  <div class="stats"><div><b>4.8 km</b><span class="meta">Distance</span></div><div><b>17 km/h</b><span class="meta">Avg speed</span></div><div><b>₹74</b><span class="meta">So far</span></div></div>
+  <div class="row"><button class="btn warn" style="flex:1">Pause</button><button class="btn danger" style="flex:1">End ride</button></div></div>
+ <div class="card pass"><span class="meta">Monthly pass</span><b style="font-size:22px">Unlimited 30 min rides</b><span class="meta">Valid until 8 Nov 2026 · 12 rides used</span><button class="btn" style="background:rgba(255,255,255,.2);color:#fff;height:42px;align-self:flex-start">Renew pass</button></div>
+ <div class="card wallet"><span>Wallet balance</span><div class="amt">₹320.00</div><div class="row"><button class="btn fill" style="height:42px">Add money</button><button class="btn" style="height:42px;color:var(--ti)">History</button></div></div>
+ <div class="card sum"><b>Booking summary</b><div class="ln"><span class="ts">Unlock fee</span><span>₹10</span></div><div class="ln"><span class="ts">2 hours × ₹60</span><span>₹120</span></div><div class="ln"><span class="ts">Promo RIDE50</span><span style="color:var(--p)">−₹10</span></div><div class="ln tot"><span>Total</span><span>₹120</span></div></div>
+ <div class="card"><b style="text-align:center">Unlock Bike #E-2048</b><div class="qr" role="img" aria-label="QR code"></div><span class="meta" style="text-align:center">Point your camera at the QR on the handlebar</span></div>
+ <div class="card"><b>How was your ride?</b><div class="stars" id="stars" role="group" aria-label="Rating">★★★★☆</div><label class="field"><input placeholder="Add a comment (optional)"></label><button class="btn fill">Submit rating</button></div>
+ <div class="card empty"><svg class="i" style="width:34px;height:34px"><use href="#bike"/></svg><b style="color:var(--ink)">No rides yet</b><span>Your trips will show up here.</span><button class="btn fill">Find a bike</button></div>
+</div>
+
+<h2>Booking steps, sheet, bar, nav, alerts</h2>
+<div class="grid">
+ <div class="panel"><span class="tag">Progress</span>
+  <div class="steps"><span class="s on">✓</span><i class="l on"></i><span class="s on">2</span><i class="l"></i><span class="s">3</span><i class="l"></i><span class="s">4</span></div>
+  <span class="meta">Choose bike · Time · Pay · Unlock</span>
+  <span class="tag">App bar</span>
+  <div class="appbar"><button class="ibtn" style="border:0" aria-label="Back"><svg class="i"><use href="#back"/></svg></button><span class="t">Confirm booking</span><button class="ibtn" style="border:0" aria-label="Help"><svg class="i"><use href="#info"/></svg></button></div>
+  <span class="tag">Alert banner and snackbar</span>
+  <div class="alert"><svg class="i"><use href="#bolt"/></svg><span>Battery is below 20%. Range may be under 6 km.</span></div>
+  <div class="toast"><span>Bike reserved for 10 minutes</span><button>Cancel</button></div>
+ </div>
+ <div class="panel"><span class="tag">Bottom sheet (station detail)</span>
+  <div class="sheet"><i class="grab"></i><div class="row sp"><b style="font-size:18px">MG Road Station</b><span class="tag-s">Open 24h</span></div><span class="ts">120 m away · 2 min walk</span>
+   <div class="row"><span class="bat hi"><i><s style="width:90%"></s></i>90%</span><span class="bat hi"><i><s style="width:72%"></s></i>72%</span><span class="bat mid"><i><s style="width:40%"></s></i>40%</span><span class="meta">+5 more</span></div>
+   <button class="btn fill block">View bikes</button></div>
+  <span class="tag">Bottom navigation</span>
+  <div class="nav" id="nv"><button class="on"><svg class="i"><use href="#map"/></svg>Map</button><button><svg class="i"><use href="#bike"/></svg>Rides</button><button><svg class="i"><use href="#wallet"/></svg>Wallet</button><button><svg class="i"><use href="#user"/></svg>Profile</button></div>
+ </div>
+</div>
+</div>
+<script>
+function tt(){var r=document.documentElement,d=matchMedia('(prefers-color-scheme:dark)').matches,c=r.dataset.theme||(d?'dark':'light');r.dataset.theme=c==='dark'?'light':'dark'}
+var h=2;function st(n){h=Math.max(1,Math.min(12,h+n));hr.textContent=h+(h>1?' hours':' hour')}
+function grp(id){var b=document.querySelectorAll('#'+id+' button');b.forEach(function(x){x.onclick=function(){b.forEach(function(y){y.classList.remove('on')});x.classList.add('on')}})}
+grp('sg');grp('nv');
+document.querySelectorAll('#ch .chip').forEach(function(c){c.onclick=function(){c.classList.toggle('on')}});
+var s=document.getElementById('sl'),k=document.getElementById('kn'),drag=false,x0=0;
+k.onpointerdown=function(e){if(s.classList.contains('done'))return;drag=true;x0=e.clientX;k.setPointerCapture(e.pointerId)};
+k.onpointermove=function(e){if(!drag)return;var m=s.clientWidth-60,d=Math.max(0,Math.min(m,e.clientX-x0));k.style.transform='translateX('+d+'px)';sx.style.opacity=1-d/m};
+k.onpointerup=function(){if(!drag)return;drag=false;var m=s.clientWidth-60,d=parseFloat((k.style.transform.match(/[\d.]+/)||[0])[0]);
+ if(d>m*.85){k.style.transform='translateX('+m+'px)';s.classList.add('done');sx.textContent='Unlocked. Ride safe!';sx.style.opacity=1;setTimeout(function(){s.classList.remove('done');k.style.transform='';sx.textContent='Slide to unlock'},2500)}
+ else{k.style.transform='';sx.style.opacity=1}};
+</script>
+</body>
+</html>

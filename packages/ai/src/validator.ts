@@ -291,6 +291,8 @@ function sanitizeParsedData(parsed: any): any {
         name: s.name || `Screen ${idx + 1}`,
         width: typeof s.width === 'number' ? s.width : 393,
         height: typeof s.height === 'number' ? s.height : 852,
+        schemaVersion: typeof s.schemaVersion === 'number' ? s.schemaVersion : 1,
+        tokens: s.tokens,
         root: sanitizeNode(s.root),
       };
     });

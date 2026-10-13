@@ -7,7 +7,7 @@
  * - This file is pure TypeScript; no host imports.
  */
 
-import type { HttpBridge } from '@tezmind/core';
+import type { HttpBridge, UiKitStyleContext } from '@tezmind/core';
 import type { Screen } from '@tezmind/core';
 import type { Patch } from '@tezmind/core';
 
@@ -38,6 +38,8 @@ export interface GenerateRequest {
   projectIdea?: string;
   styleKeywords?: string[];
   brandColor?: string;
+  materialDesign3?: boolean;
+  uiKit?: UiKitStyleContext;
   deviceWidth: number;
   deviceHeight: number;
   deviceType: string;
@@ -57,6 +59,8 @@ export interface GenerateRequest {
   // Options
   maxScreens?: number;              // for screen mode
   variationCount?: number;          // for variations mode
+  maxOutputTokens?: number;         // token budget override
+  partial?: string;                 // for continuation calls
 }
 
 // ─── GENERATE EVENTS ─────────────────────────────────────────────────────────
@@ -68,7 +72,7 @@ export type GenerateEvent =
   | { type: 'patch'; patch: Patch }
   | { type: 'usage'; inputTokens: number; outputTokens: number; cost?: number }
   | { type: 'error'; code: GenerateErrorCode; message: string; retryable: boolean }
-  | { type: 'done' };
+  | { type: 'done'; finishReason?: string; usage?: { input: number; output: number } };
 
 export type GenerateErrorCode =
   | 'invalid_token'

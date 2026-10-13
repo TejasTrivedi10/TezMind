@@ -5,6 +5,8 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "outDir": "dist",
+    "declaration": true,
     "paths": {
       "@tezmind/core": ["../core/src/index.ts"]
     }

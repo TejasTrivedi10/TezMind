@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
+import { ArrowLeft, Bot, Check, ExternalLink, GitBranch, Sparkles, ShieldCheck, Zap } from 'lucide-react-native';
 import { colors, typography, spacing, radii } from '../design/tokens';
 import { getSecretStorage } from '../host/secrets';
 import { redactToken } from '@tezmind/ai';
@@ -22,7 +23,6 @@ const PROVIDERS = [
     id: 'anthropic',
     name: 'Anthropic',
     subtitle: 'Claude (Opus, Sonnet, Haiku)',
-    emoji: '🤖',
     docsUrl: 'https://console.anthropic.com/settings/keys',
     placeholder: 'sk-ant-api03-…',
     corsNote: 'Direct browser calls supported (anthropic-dangerous-direct-browser-access header).',
@@ -31,7 +31,6 @@ const PROVIDERS = [
     id: 'google',
     name: 'Google AI Studio',
     subtitle: 'Gemini (Pro, Flash, Ultra)',
-    emoji: '♊',
     docsUrl: 'https://aistudio.google.com/app/apikey',
     placeholder: 'AIzaSy…',
     corsNote: 'Direct browser calls supported.',
@@ -40,7 +39,6 @@ const PROVIDERS = [
     id: 'openai',
     name: 'OpenAI',
     subtitle: 'GPT-4o, GPT-4o Mini, o1',
-    emoji: '⚡',
     docsUrl: 'https://platform.openai.com/api-keys',
     placeholder: 'sk-proj-…',
     corsNote: 'CORS blocked — recommend enabling the local proxy (Settings → Proxy).',
@@ -49,7 +47,6 @@ const PROVIDERS = [
     id: 'openrouter',
     name: 'OpenRouter',
     subtitle: 'Access 100+ models via one key',
-    emoji: '🔀',
     docsUrl: 'https://openrouter.ai/keys',
     placeholder: 'sk-or-v1-…',
     corsNote: 'Uses the local proxy for CORS.',
@@ -57,6 +54,7 @@ const PROVIDERS = [
 ];
 
 function ProviderRow({ provider }: { provider: typeof PROVIDERS[number] }) {
+  const ProviderIcon = provider.id === 'anthropic' ? Bot : provider.id === 'google' ? Sparkles : provider.id === 'openai' ? Zap : GitBranch;
   const [token, setToken] = useState('');
   const [savedRedacted, setSavedRedacted] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -104,7 +102,7 @@ function ProviderRow({ provider }: { provider: typeof PROVIDERS[number] }) {
     <View style={styles.providerRow}>
       <View style={styles.providerHeader}>
         <View style={styles.providerIcon}>
-          <Text style={styles.providerEmoji}>{provider.emoji}</Text>
+          <ProviderIcon size={19} color="#10A37F" strokeWidth={1.8} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={styles.providerName}>{provider.name}</Text>
@@ -112,7 +110,7 @@ function ProviderRow({ provider }: { provider: typeof PROVIDERS[number] }) {
         </View>
         {savedRedacted && !isEditing && (
           <View style={styles.savedBadge}>
-            <Text style={styles.savedBadgeText}>✓ Set</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}><Check size={12} color="#087F63" /><Text style={styles.savedBadgeText}>Set</Text></View>
           </View>
         )}
       </View>
@@ -169,7 +167,7 @@ function ProviderRow({ provider }: { provider: typeof PROVIDERS[number] }) {
       )}
 
       <Pressable onPress={() => {/* open docs */ }}>
-        <Text style={styles.docsLink}>Get API key →</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}><Text style={styles.docsLink}>Get API key</Text><ExternalLink size={13} color="#10A37F" /></View>
       </Pressable>
     </View>
   );
@@ -181,7 +179,7 @@ export default function SettingsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backBtnText}>← Back</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><ArrowLeft size={15} color="#666" /><Text style={styles.backBtnText}>Back</Text></View>
         </Pressable>
         <Text style={styles.headerTitle}>Settings</Text>
         <View style={{ width: 60 }} />
@@ -190,7 +188,7 @@ export default function SettingsScreen() {
       <ScrollView style={styles.content} contentContainerStyle={styles.contentInner}>
         {/* Privacy notice */}
         <View style={styles.privacyBanner}>
-          <Text style={styles.privacyIcon}>🔒</Text>
+          <View style={styles.privacyIcon}><ShieldCheck size={20} color="#10A37F" strokeWidth={1.8} /></View>
           <View style={{ flex: 1 }}>
             <Text style={styles.privacyTitle}>Your keys, your data</Text>
             <Text style={styles.privacyText}>
@@ -260,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: radii.xl, backgroundColor: 'rgba(0, 212, 170, 0.06)',
     borderWidth: 1, borderColor: 'rgba(0, 212, 170, 0.2)', alignItems: 'flex-start',
   },
-  privacyIcon: { fontSize: 24 },
+  privacyIcon: { width: 28, height: 28, alignItems: 'center', justifyContent: 'center' },
   privacyTitle: { fontSize: typography.fontSize.base, fontWeight: typography.fontWeight.semibold, color: colors.accent, marginBottom: spacing[1] },
   privacyText: { fontSize: typography.fontSize.sm, color: colors.textSecondary, lineHeight: 20 },
 

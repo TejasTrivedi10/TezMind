@@ -1,6 +1,7 @@
 import type { Screen, DesignNode, StyleSpec, Layout, Sizing, Color } from '../dsl';
 import { CURRENT_SCHEMA_VERSION } from '../dsl';
 import { getDslNodeType, ALLOWED_STYLE_PROPERTIES } from './subset';
+import type { Role } from './roles';
 
 export interface HtmlToDslResult {
   screens: Screen[];
@@ -251,10 +252,18 @@ function extractLayout(styleMap: Record<string, string>): Layout {
   };
 }
 
+
+export interface HtmlToDslOptions {
+  width?: number;
+  height?: number;
+  projectName?: string;
+  roles?: Role[];
+}
+
 /**
  * Convert HTML subset string to TezDSL Screen array
  */
-export function htmlToDsl(html: string, options?: { width?: number; height?: number; projectName?: string }): HtmlToDslResult {
+export function htmlToDsl(html: string, options?: HtmlToDslOptions): HtmlToDslResult {
   const errors: string[] = [];
   const width = options?.width ?? 393;
   const height = options?.height ?? 852;
@@ -271,13 +280,17 @@ export function htmlToDsl(html: string, options?: { width?: number; height?: num
     const name = htmlNode.attributes['data-tz-name'] || `${htmlNode.tagName}_${id}`;
     const type = getDslNodeType(htmlNode.tagName, htmlNode.attributes['data-tz-type']);
 
+    const role = htmlNode.attributes['data-role'];
     const props: Record<string, unknown> = {};
+    if (role) props.role = role;
+
     if (type === 'text') {
       props.content = htmlNode.textContent || 'Text';
     } else if (type === 'button') {
       props.label = htmlNode.textContent || 'Button';
     } else if (type === 'input') {
       props.placeholder = htmlNode.attributes['placeholder'] || '';
+      props.multiline = htmlNode.tagName === 'TEXTAREA';
     } else if (type === 'icon') {
       props.name = htmlNode.attributes['data-icon'] || 'heart';
     } else if (type === 'image') {
@@ -293,7 +306,7 @@ export function htmlToDsl(html: string, options?: { width?: number; height?: num
 
     const children = htmlNode.children.map(convertNode);
 
-    return {
+    const node: DesignNode = {
       id,
       type: type as any,
       name,
@@ -303,6 +316,9 @@ export function htmlToDsl(html: string, options?: { width?: number; height?: num
       layout,
       children: children.length > 0 ? children : undefined,
     };
+    if (role) (node as any).role = role;
+
+    return node;
   }
 
   const rootNodes = parseHtmlFragment(html);
@@ -314,7 +330,7 @@ export function htmlToDsl(html: string, options?: { width?: number; height?: num
       type: 'frame',
       name: 'Root Screen',
       props: {},
-      style: { backgroundColor: '#0F172A' },
+      style: { backgroundColor: '#FFFFFF' },
       sizing: { width: { mode: 'fixed', value: width }, height: { mode: 'fixed', value: height } },
       layout: { direction: 'column', gap: 16, padding: { top: 24, right: 16, bottom: 24, left: 16 }, mainAxis: 'start', crossAxis: 'stretch' },
       children: [],
@@ -345,12 +361,28 @@ export function htmlToDsl(html: string, options?: { width?: number; height?: num
 }
 
 /**
- * Convert a TezDSL DesignNode to subset HTML element
+ * Convert a TezDSL DesignNode to Layout Contract v2 HTML element
  */
-function nodeToHtml(node: DesignNode): string {
-  const tag = node.type === 'header' ? 'header' : node.type === 'footer' ? 'footer' : node.type === 'text' ? 'p' : node.type === 'button' ? 'button' : node.type === 'input' ? 'input' : node.type === 'image' ? 'img' : node.type === 'icon' ? 'i' : node.type === 'divider' ? 'hr' : 'div';
+function nodeToHtml(node: DesignNode, isRoot = false): string {
+  const isScreen = isRoot || node.id === 'root' || node.type === 'frame';
+  const idAttr = `data-tz-id="${node.id}"`;
+  const nameAttr = `data-tz-name="${node.name || node.id}"`;
 
-  const styles: string[] = ['display:flex'];
+  if (isScreen) {
+    const inner = (node.children || []).map((c) => nodeToHtml(c, false)).join('');
+    return `<div class="screen col fill" ${idAttr} ${nameAttr}>${inner}</div>`;
+  }
+
+  if (node.type === 'icon') {
+    const iconName = (node.props?.name as string) || 'sparkles';
+    return `<span class="icon" data-icon="${iconName}" data-size="20" ${idAttr} ${nameAttr}></span>`;
+  }
+
+  if (node.type === 'image') {
+    return `<div class="img" data-img="placeholder" ${idAttr} ${nameAttr}></div>`;
+  }
+
+  const styles: string[] = [];
   if (node.layout) {
     styles.push(`flex-direction:${node.layout.direction}`);
     styles.push(`gap:${node.layout.gap}px`);
@@ -362,28 +394,41 @@ function nodeToHtml(node: DesignNode): string {
   if (node.style?.fontSize) styles.push(`font-size:${node.style.fontSize}px`);
   if (node.style?.fontWeight) styles.push(`font-weight:${node.style.fontWeight}`);
 
-  const styleAttr = styles.join(';');
-  const idAttr = `data-tz-id="${node.id}"`;
-  const nameAttr = `data-tz-name="${node.name || node.id}"`;
+  const styleAttr = styles.length > 0 ? `style="${styles.join(';')}"` : '';
 
-  let inner = '';
+  if (node.type === 'button') {
+    const label = (node.props.label as string) || 'Button';
+    return `<button class="btn-primary row gap-2 center hug" ${idAttr} ${nameAttr} ${styleAttr}>${label}</button>`;
+  }
+
   if (node.type === 'text') {
-    inner = (node.props.content as string) || '';
-  } else if (node.type === 'button') {
-    inner = (node.props.label as string) || '';
-  } else if (node.children && node.children.length > 0) {
-    inner = node.children.map(nodeToHtml).join('');
+    const content = (node.props.content as string) || '';
+    const isHeading = Boolean((node.style?.fontSize && node.style.fontSize >= 18) || (node.name && /title|header|heading/i.test(node.name)));
+    const tag = isHeading ? 'h2' : 'p';
+    const cls = isHeading ? 'text-lg' : 'text-md';
+    return `<${tag} class="${cls}" ${idAttr} ${nameAttr} ${styleAttr}>${content}</${tag}>`;
   }
 
-  if (tag === 'img' || tag === 'hr' || tag === 'input') {
-    return `<${tag} ${idAttr} ${nameAttr} style="${styleAttr}" />`;
+  if (node.type === 'card') {
+    const dirClass = node.layout?.direction === 'row' ? 'row' : 'col';
+    const inner = (node.children || []).map((c) => nodeToHtml(c, false)).join('');
+    return `<div class="card ${dirClass} gap-3 p-4" ${idAttr} ${nameAttr} ${styleAttr}>${inner}</div>`;
   }
-  return `<${tag} ${idAttr} ${nameAttr} style="${styleAttr}">${inner}</${tag}>`;
+
+  const tag = node.type === 'header' ? 'header' : node.type === 'footer' ? 'footer' : node.type === 'input' ? 'input' : 'div';
+  const dirClass = node.layout?.direction === 'row' ? 'row' : 'col';
+  const inner = (node.children || []).map((c) => nodeToHtml(c, false)).join('');
+
+  if (tag === 'input') {
+    return `<input ${idAttr} ${nameAttr} ${styleAttr} placeholder="${(node.props.placeholder as string) || ''}" />`;
+  }
+
+  return `<${tag} class="${dirClass}" ${idAttr} ${nameAttr} ${styleAttr}>${inner}</${tag}>`;
 }
 
 /**
  * Convert a TezDSL Screen to subset HTML
  */
 export function dslToHtml(screen: Screen): string {
-  return nodeToHtml(screen.root);
+  return nodeToHtml(screen.root, true);
 }

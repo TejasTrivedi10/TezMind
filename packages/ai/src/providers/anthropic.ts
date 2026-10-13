@@ -12,6 +12,7 @@ import type { HttpBridge } from '@tezmind/core';
 import type { AIProvider, GenerateRequest, GenerateEvent, ModelInfo, TokenValidationResult } from '../provider';
 import { FALLBACK_MODELS } from '../models.fallback';
 import { buildScreenGenPrompt, buildImageToDesignPrompt, buildEditByPromptPrompt, buildValidationRetryPrompt } from '../prompts/v1';
+import { buildHtmlSystemPrompt, buildHtmlUserPrompt } from '../prompts/html';
 import { validateScreensOutput, validatePatchOutput } from '../validator';
 import { redactToken } from '../util';
 
@@ -245,6 +246,9 @@ export class AnthropicProvider implements AIProvider {
   }
 
   private buildPrompt(req: GenerateRequest): { system: string; user: string } {
+    if (req.mode === 'screen' && (req.selectedNodeId || req.materialDesign3)) {
+      return { system: buildHtmlSystemPrompt(req), user: buildHtmlUserPrompt(req) };
+    }
     if (req.mode === 'edit' && req.selectedNodeId && req.selectedNodeJson) {
       return buildEditByPromptPrompt({
         selectedNodeId: req.selectedNodeId,

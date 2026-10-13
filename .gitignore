@@ -16,6 +16,7 @@ web-build/
 packages/*/dist/
 apps/*/dist/
 apps/*/build/
+apps/web/public/material3.js
 
 # coverage
 coverage/

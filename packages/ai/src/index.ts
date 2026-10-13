@@ -1,7 +1,3 @@
-/**
- * @tezmind/ai — Public API
- */
-
 // Provider interface + types
 export type { AIProvider, AIProviderRegistry, ModelInfo, GenerateRequest, GenerateEvent, GenerateMode, GenerateErrorCode, TokenValidationResult } from './provider';
 
@@ -16,7 +12,12 @@ export type { ModelCategoryGroup, ModelTestResult } from './models/registry';
 // Prompts
 export { buildScreenGenPrompt, buildImageToDesignPrompt, buildEditByPromptPrompt, buildValidationRetryPrompt, DSL_SCHEMA_SUMMARY, DSL_EXAMPLE_COMPACT } from './prompts/v1';
 export { buildHtmlSystemPrompt, buildHtmlUserPrompt } from './prompts/html';
+export { buildRefinerSystemPrompt, buildRefinerUserPrompt } from './prompts/refine';
 export type { ScreenGenParams, ImageToDesignParams, EditByPromptParams } from './prompts/v1';
+
+// Refiner
+export { refinePrompt } from './refine';
+export type { RefineRequest, RefineResult } from './refine';
 
 // Validation
 export { validateScreensOutput, validatePatchOutput, extractJson } from './validator';
@@ -25,9 +26,19 @@ export type { ValidationResult, ValidationSuccess, ValidationFailure } from './v
 // Fallback models
 export { FALLBACK_MODELS } from './models.fallback';
 
-// Allowlists
-export { ICON_NAMES, ICON_NAMES_ARRAY, ALLOWED_FONTS } from './allowlists';
-export type { AllowedFont } from './allowlists';
+// Expander & Generation Pipeline (Contract v2)
+export { expandPrompt, renderGeneratorPrompt } from './expand';
+export type { LlmJson } from './expand';
+export { expand, generateFromBrief, streamComplete, DEFAULT_PROFILE } from './pipeline';
+export type { PipelineEvent, PipelineReport, PipelineDeps, ModelProfile, Usage } from './pipeline';
+// Prompts
+export { buildExpanderSystem } from './prompts/expand';
+export { buildRepairPrompt } from './prompts/repair';
+
+// Design-kit selection and project-creation options
+export { UI_KIT_CATALOG, UI_KIT_OPTIONS, recommendUiKit, resolveUiKit, getUiKitContext, resolveUiKitAccent } from './ui_kits/catalog';
+export type { UiKitOption } from './ui_kits/catalog';
 
 // Utilities
-export { redactToken, redactFromText } from './util';
+export { redactToken } from './util';
+

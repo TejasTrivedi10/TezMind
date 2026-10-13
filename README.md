@@ -67,6 +67,16 @@ TezMind never contacts any AI provider on your behalf. You supply your own API k
 
 ## 🏗️ Architecture
 
+### Generated image assets
+
+When a generated screen contains image placeholders (`.img[data-img]`), the preview can search Unsplash using the image's descriptive alt text and display the first suitable result. Image discovery is optional: without the Python service or an Unsplash key, TezMind keeps its local gradient placeholders. The service keeps the Unsplash key off the browser and includes photographer attribution with each returned image.
+
+1. Register an Unsplash API application and copy its access key into `UNSPLASH_ACCESS_KEY` in `.env`.
+2. Install the service dependencies with `python -m pip install -r python/requirements.txt`.
+3. Start the service with `pnpm images:dev` alongside `pnpm dev`.
+
+Set `EXPO_PUBLIC_IMAGE_SEARCH_URL` when the service runs on a different address. Unsplash API usage requires hotlinked image URLs and visible photographer attribution; TezMind follows those requirements in the preview.
+
 TezMind uses a **pnpm monorepo** with strict package boundaries:
 
 ```
