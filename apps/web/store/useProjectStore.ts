@@ -99,7 +99,7 @@ export const useProjectStore = create<ProjectStoreState>((set, get) => ({
         mainAxis: 'start' as const,
         crossAxis: 'stretch' as const,
       },
-      style: { backgroundColor: '#0F111A' },
+      style: { backgroundColor: data.chosenPalette?.colors.background || '#FFFFFF' },
       props: {},
       children: [],
     };

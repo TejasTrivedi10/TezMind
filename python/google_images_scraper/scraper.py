@@ -39,9 +39,27 @@ class GoogleImagesScraper:
     def __init__(self, logger: logging.Logger | None = None) -> None:
         self._logger = logger if logger else logging.getLogger(__name__)
         self._consent_button_xpath = "/html/body/c-wiz/div/div/div/div[2]/div[1]/div[3]/div[1]/div[1]/form[2]/div/div/button/span"
+        self._driver: webdriver.Chrome | None = None
+        self._driver_path: str | None = None
 
-    def _init_chrome_driver(self) -> webdriver.Chrome:
-        """Initializes Chrome webdriver with stealth options."""
+    def _get_or_create_driver(self) -> webdriver.Chrome:
+        """Returns active Chrome webdriver, creating or recreating if dead."""
+        if self._driver is not None:
+            try:
+                # Quick health check
+                _ = self._driver.current_window_handle
+                return self._driver
+            except Exception:
+                self._logger.warning("Existing Chrome driver session lost, recreating...")
+                try:
+                    self._driver.quit()
+                except Exception:
+                    pass
+                self._driver = None
+
+        if self._driver_path is None:
+            self._driver_path = ChromeDriverManager().install()
+
         chrome_options = Options()
         chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--no-sandbox")
@@ -53,10 +71,15 @@ class GoogleImagesScraper:
         chrome_options.add_argument(
             "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         )
-        service = Service(ChromeDriverManager().install())
+        service = Service(self._driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.set_page_load_timeout(15)
         driver.execute_script("Object.defineProperty(navigator, 'webdriver', {get: () => undefined})")
+        self._driver = driver
         return driver
+
+    def _init_chrome_driver(self) -> webdriver.Chrome:
+        return self._get_or_create_driver()
 
     def _click_consent_button(self, driver: webdriver.Chrome) -> None:
         """Clicks google consent form with selenium Chrome webdriver"""
@@ -211,6 +234,9 @@ class GoogleImagesScraper:
             return results
         except Exception as e:
             self._logger.exception(f"Error scraping images for query: {search_query}")
+            try:
+                driver.quit()
+            except Exception:
+                pass
+            self._driver = None
             raise DriverGetImageDataError from e
-        finally:
-            driver.quit()

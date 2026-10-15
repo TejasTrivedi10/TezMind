@@ -69,8 +69,17 @@ export interface ProjectMeta {
   /** Kit locked by the first successful generation when uiKitId is `auto`. */
   resolvedUiKitId?: string;
   brandColor?: string;
-  /** Generate screens using Material Design 3 color roles and component guidance. */
+  /** @deprecated Kept for backward compatibility with legacy projects */
   materialDesign3?: boolean;
+  designMode?: 'auto' | 'custom' | 'seed';
+  seedKitId?: string;
+  userHints?: string;
+  parsedHints?: import('./designSystem/schema').ParsedHints;
+  paletteOptions?: PaletteOption[];
+  chosenPalette?: PaletteOption;
+  paletteSource?: 'grounded' | 'serp' | 'knowledge' | 'hint';
+  domainProfile?: { domain: string; audience: string; mood: string[] };
+  designSystemLocked?: boolean;
   defaultProvider?: string;
   defaultModelId?: string;
   createdAt: number;
@@ -78,6 +87,25 @@ export interface ProjectMeta {
   schemaVersion: number;
   /** Base64-encoded PNG thumbnail of the first screen. */
   thumbnail?: string;
+}
+
+export interface PaletteOption {
+  id: string;
+  name: string;
+  description: string;
+  mood: string[];
+  mode: 'light' | 'dark';
+  colors: {
+    primary: string; onPrimary: string; secondary: string; accent: string;
+    background: string; surface: string; surfaceAlt: string; border: string;
+    text: string; textMuted: string; success: string; warning: string; danger: string;
+  };
+  source: 'grounded' | 'serp' | 'knowledge' | 'hint';
+  /** Search sources used to inform this palette, when grounding succeeded. */
+  references?: string[];
+  /** Local UI-kit references retrieved to inform a knowledge-based palette. */
+  basis?: string[];
+  preview: { sampleButtonLabel: string; sampleCardTitle: string };
 }
 
 export interface UiKitStyleContext {
@@ -92,7 +120,9 @@ export interface UiKitStyleContext {
     text: string;
     primary: string;
     secondary: string;
+    accent?: string;
   };
+  mode?: 'light' | 'dark';
   fonts: { heading: string; body: string };
   guidance: string;
 }

@@ -10,9 +10,11 @@ import { stripFences } from './completeness';
 import { ICON_NAMES } from '../icons/names';
 import { COMPOSER_HTML, SEARCH_HTML, BOTTOM_NAV_HTML } from './templates';
 import type { Role } from './roles';
+import type { DesignSystem } from '../designSystem/schema';
 
 export interface FixCtx {
   required: Role[];
+  designSystem?: DesignSystem;
 }
 
 export const ALLOWED_ENTRANCE_MOTIONS = new Set(['fade-in', 'fade-up', 'fade-down', 'slide-left', 'slide-right', 'scale-in']);
@@ -59,6 +61,11 @@ export function autofix(raw: string, ctx: FixCtx = { required: [] }): string {
   legacyIcons(doc);
   vocabulary(doc);
   spacing(root);
+  snapOffGridSpacing(root);
+  if (ctx.designSystem) {
+    snapRawColors(root, ctx.designSystem);
+  }
+  unwrapEmptyContainers(root);
   textFill(root);
   normalizeBottomNavigation(root);
   scrollStructure(root);
@@ -113,9 +120,8 @@ function sanitize(doc: Document) {
 
 function isTrustedImageUrl(value: string): boolean {
   try {
-    if (value.startsWith('data:image/')) return true;
     const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:';
+    return url.protocol === 'https:' && !!url.hostname && !url.username && !url.password;
   } catch {
     return false;
   }
@@ -124,7 +130,7 @@ function isTrustedImageUrl(value: string): boolean {
 function isTrustedImageLink(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:';
+    return url.protocol === 'https:' && !!url.hostname && !url.username && !url.password;
   } catch {
     return false;
   }
@@ -198,6 +204,118 @@ function spacing(root: HTMLElement) {
     if (!hasPx) c.classList.add('px-4');
     if (!hasPy) c.classList.add('py-3');
   });
+}
+
+const NON_GRID_PROPS = new Set([
+  'border-radius', 'font-size', 'line-height', 'letter-spacing',
+  'opacity', 'border-width', 'border', 'flex-grow', 'flex-shrink', 'z-index',
+]);
+
+function snapOffGridSpacing(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>('[style]').forEach((el) => {
+    const st = el.getAttribute('style');
+    if (!st) return;
+    const decls = st.split(';').map((s) => s.trim()).filter(Boolean);
+    let changed = false;
+    const newDecls = decls.map((decl) => {
+      const colonIdx = decl.indexOf(':');
+      if (colonIdx === -1) return decl;
+      const prop = decl.slice(0, colonIdx).trim().toLowerCase();
+      const val = decl.slice(colonIdx + 1).trim();
+      if (NON_GRID_PROPS.has(prop)) return decl;
+      const replaced = val.replace(/(\d+(?:\.\d+)?)px/g, (match, numStr) => {
+        const num = parseFloat(numStr);
+        if (num === 1 || isNaN(num) || num % 4 === 0) return match;
+        changed = true;
+        return `${Math.round(num / 4) * 4}px`;
+      });
+      return `${prop}: ${replaced}`;
+    });
+    if (changed) {
+      el.setAttribute('style', newDecls.join('; '));
+    }
+  });
+}
+
+function parseHex(h: string): [number, number, number] | null {
+  const clean = h.replace('#', '');
+  if (clean.length === 3) {
+    return [
+      parseInt(clean[0] + clean[0], 16),
+      parseInt(clean[1] + clean[1], 16),
+      parseInt(clean[2] + clean[2], 16),
+    ];
+  }
+  if (clean.length === 6) {
+    return [
+      parseInt(clean.slice(0, 2), 16),
+      parseInt(clean.slice(2, 4), 16),
+      parseInt(clean.slice(4, 6), 16),
+    ];
+  }
+  return null;
+}
+
+function findNearestColorToken(hex: string, colors: Record<string, string>): string {
+  const targetRgb = parseHex(hex);
+  if (!targetRgb) return hex;
+  let bestDist = Infinity;
+  let bestToken = 'background';
+  for (const [name, colorHex] of Object.entries(colors)) {
+    const rgb = parseHex(colorHex);
+    if (!rgb) continue;
+    const dist = (targetRgb[0] - rgb[0]) ** 2 + (targetRgb[1] - rgb[1]) ** 2 + (targetRgb[2] - rgb[2]) ** 2;
+    if (dist < bestDist) {
+      bestDist = dist;
+      bestToken = name.replace(/([A-Z])/g, (m) => `-${m.toLowerCase()}`);
+    }
+  }
+  return `var(--c-${bestToken})`;
+}
+
+function snapRawColors(root: HTMLElement, ds: DesignSystem) {
+  root.querySelectorAll<HTMLElement>('[style]').forEach((el) => {
+    const st = el.getAttribute('style');
+    if (!st) return;
+    const replaced = st.replace(/#(?:[0-9a-fA-F]{3}){1,2}\b/g, (hexMatch) => {
+      return findNearestColorToken(hexMatch, ds.colors as Record<string, string>);
+    });
+    if (replaced !== st) {
+      el.setAttribute('style', replaced);
+    }
+  });
+}
+
+function unwrapEmptyContainers(root: HTMLElement) {
+  for (let pass = 0; pass < 3; pass++) {
+    let unwrapOccurred = false;
+    const divs = Array.from(root.querySelectorAll<HTMLElement>('div'));
+    for (const div of divs) {
+      if (div === root) continue;
+      // Skip if has semantic markers or attributes
+      if (
+        div.hasAttribute('data-tz-id') ||
+        div.hasAttribute('data-role') ||
+        div.hasAttribute('data-section') ||
+        div.hasAttribute('data-component') ||
+        div.hasAttribute('style') ||
+        div.id
+      ) {
+        continue;
+      }
+      // Check if div has no class or only empty class
+      const cls = (div.getAttribute('class') ?? '').trim();
+      if (cls !== '') continue;
+
+      // Only unwrap if exactly one child element and no text nodes outside
+      if (div.children.length === 1 && (div.textContent?.trim() === (div.firstElementChild as HTMLElement)?.textContent?.trim())) {
+        const child = div.firstElementChild as HTMLElement;
+        div.replaceWith(child);
+        unwrapOccurred = true;
+      }
+    }
+    if (!unwrapOccurred) break;
+  }
 }
 
 function textFill(root: HTMLElement) {

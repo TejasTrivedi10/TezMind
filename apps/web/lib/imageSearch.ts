@@ -24,9 +24,15 @@ function inferOrientation(element: HTMLElement): 'landscape' | 'portrait' | 'squ
 }
 
 function imageQuery(element: HTMLElement): string {
+  const customQuery = (element.dataset.imageQuery || element.dataset.query || '').trim();
+  if (customQuery) return customQuery;
   const alt = (element.dataset.alt || '').trim();
   if (alt && !/^(image|photo|picture|placeholder|background)$/i.test(alt)) return alt;
-  return (element.dataset.img || '').replace(/[-_]+/g, ' ').trim();
+  const imgSlug = (element.dataset.img || element.dataset.bgImg || '').replace(/[-_]+/g, ' ').trim();
+  if (imgSlug && !/^(image|photo|picture|placeholder|background)$/i.test(imgSlug)) return imgSlug;
+  const aria = (element.getAttribute('aria-label') || '').trim();
+  if (aria && !/^(photo|image|picture)$/i.test(aria)) return aria;
+  return alt || imgSlug || 'photo';
 }
 
 async function searchImage(query: string, orientation: string): Promise<SearchedImage | null> {
@@ -35,7 +41,7 @@ async function searchImage(query: string, orientation: string): Promise<Searched
   if (cached) return cached;
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 7000);
+  const timeout = setTimeout(() => controller.abort(), 15000);
   const request = fetch(
     `${baseUrl}/api/images/search?query=${encodeURIComponent(query)}&orientation=${orientation}&limit=1`,
     { signal: controller.signal },
@@ -56,10 +62,8 @@ async function searchImage(query: string, orientation: string): Promise<Searched
         return null;
       }
       try {
-        if (!result.image_url.startsWith('data:image/')) {
-          const imageUrl = new URL(result.image_url);
-          if (imageUrl.protocol !== 'https:' && imageUrl.protocol !== 'http:') return null;
-        }
+        const imageUrl = new URL(result.image_url);
+        if (imageUrl.protocol !== 'https:' || !imageUrl.hostname || imageUrl.username || imageUrl.password) return null;
       } catch {
         searchCache.delete(key);
         return null;
@@ -97,9 +101,11 @@ function showImage(element: HTMLElement, result: SearchedImage): void {
   element.appendChild(credit);
 }
 
+const IMAGE_SELECTOR = '.img[data-img], .img[data-alt], [data-img], [data-bg-img], .img';
+
 /** Resolve generated image placeholders to real, attributed photos when the local service is available. */
 export async function resolveGeneratedImages(root: HTMLElement): Promise<void> {
-  const images = Array.from(root.querySelectorAll<HTMLElement>('.img[data-img]'))
+  const images = Array.from(root.querySelectorAll<HTMLElement>(IMAGE_SELECTOR))
     .filter((element) => !element.dataset.imageUrl && element.dataset.imageResolved !== 'true' && element.dataset.imageSearchPending !== 'true')
     .slice(0, 6);
 
@@ -112,7 +118,7 @@ export async function resolveGeneratedImages(root: HTMLElement): Promise<void> {
     if (!result || !element.isConnected) return;
 
     showImage(element, result);
-    // Unsplash asks API clients to report an image selection through this URL.
+    // Report image selection
     void fetch(`${baseUrl}/api/images/selection/${encodeURIComponent(result.id)}`, { method: 'POST' }).catch(() => undefined);
   }));
 }
@@ -123,7 +129,7 @@ export async function resolveGeneratedImagesInHtml(html: string): Promise<string
   const doc = new DOMParser().parseFromString(`<body>${html}</body>`, 'text/html');
   const root = doc.body.firstElementChild as HTMLElement | null;
   if (!root) return html;
-  const images = Array.from(root.querySelectorAll<HTMLElement>('.img[data-img]'))
+  const images = Array.from(root.querySelectorAll<HTMLElement>(IMAGE_SELECTOR))
     .filter((element) => !element.dataset.imageUrl)
     .slice(0, 6);
 
@@ -132,9 +138,7 @@ export async function resolveGeneratedImagesInHtml(html: string): Promise<string
     if (query.length < 2) return;
     const result = await searchImage(query, inferOrientation(element));
     if (!result) return;
-    element.dataset.imageUrl = result.image_url;
-    element.dataset.imageCredit = result.photographer;
-    element.dataset.imageCreditUrl = result.photographer_url;
+    showImage(element, result);
     void fetch(`${baseUrl}/api/images/selection/${encodeURIComponent(result.id)}`, { method: 'POST' }).catch(() => undefined);
   }));
   return root.outerHTML;

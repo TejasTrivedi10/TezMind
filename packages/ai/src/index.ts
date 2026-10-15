@@ -39,6 +39,21 @@ export { buildRepairPrompt } from './prompts/repair';
 export { UI_KIT_CATALOG, UI_KIT_OPTIONS, recommendUiKit, resolveUiKit, getUiKitContext, resolveUiKitAccent } from './ui_kits/catalog';
 export type { UiKitOption } from './ui_kits/catalog';
 
+// Hints parser
+export { parseHints } from './parseHints';
+export { composePaletteOptions, detectPaletteNeed, researchPaletteReferences } from './palette';
+export type { DomainProfile, PaletteResearchResult } from './palette';
+
+// Dynamic Design System & Component Pipeline
+export { buildDesignSystemSystemPrompt, buildDesignSystemUserPrompt } from './designSystem/prompt';
+export { generateDesignSystem, createFallbackDesignSystem } from './designSystem/generate';
+export type { GenerateDesignSystemResult } from './designSystem/generate';
+export { analyzeScreen, buildScreenAnalysisSystemPrompt, createFallbackComposition } from './components/analyze';
+export { planComponents } from './components/plan';
+export type { ComponentPlan } from './components/plan';
+export { buildComponents } from './components/build';
+export { ComponentRegistry } from './components/registry';
+
 // Utilities
 export { redactToken } from './util';
 

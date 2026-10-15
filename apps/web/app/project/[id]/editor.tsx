@@ -501,13 +501,16 @@ export default function EditorScreen() {
     const kitId = project?.resolvedUiKitId || project?.uiKitId;
     const uiKit = getUiKitContext(kitId, promptText, project?.idea || project?.description || '');
     const kitKeywords = resolveUiKit(kitId, promptText, project?.idea || project?.description || '').keywords;
-    const kitFallbackColor = kitId && kitId !== 'auto'
+    const chosenPalette = project?.chosenPalette;
+    const kitFallbackColor = chosenPalette?.colors.primary || (kitId && kitId !== 'auto'
       ? project.brandColor || uiKit.palette.primary
-      : uiKit.palette.primary;
-    const brand = project?.materialDesign3
+      : uiKit.palette.primary);
+    const brand = chosenPalette?.colors.primary || (project?.materialDesign3
       ? resolvePromptAccent(promptText, uiKit.palette.primary)
-      : resolveUiKitAccent(promptText, kitFallbackColor);
-    const selectedUiKit = { ...uiKit, palette: { ...uiKit.palette, primary: brand } };
+      : resolveUiKitAccent(promptText, kitFallbackColor));
+    const selectedUiKit = chosenPalette
+      ? { ...uiKit, mode: chosenPalette.mode, palette: { ...uiKit.palette, background: chosenPalette.colors.background, surface: chosenPalette.colors.surface, text: chosenPalette.colors.text, primary: chosenPalette.colors.primary, secondary: chosenPalette.colors.secondary, accent: chosenPalette.colors.accent }, guidance: `${uiKit.guidance}\nLOCKED PROJECT PALETTE (hard constraint): ${JSON.stringify(chosenPalette.colors)}. Do not change these colors.` }
+      : { ...uiKit, palette: { ...uiKit.palette, primary: brand } };
     return {
       prompt: promptText,
       project: {
@@ -666,7 +669,7 @@ export default function EditorScreen() {
       : input.project.brand;
     const generationColorScheme = targetedEdit
       ? screen?.colorScheme || 'light'
-      : resolvePromptColorScheme(input.prompt);
+      : project.chosenPalette?.mode || resolvePromptColorScheme(input.prompt);
 
     const deps: PipelineDeps = {
       provider,

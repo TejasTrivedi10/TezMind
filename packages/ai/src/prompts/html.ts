@@ -99,7 +99,7 @@ export function buildHtmlSystemPrompt(req: GenerateRequest): string {
   const height = req.deviceHeight ?? 852;
   const isMobile = (req.deviceType ?? 'mobile').includes('mobile') || width < 600;
   const kitContext = req.uiKit
-    ? `\nSELECTED UI KIT — ${req.uiKit.name} (${req.uiKit.vibe})\n${req.uiKit.description}\n${req.uiKit.guidance}\nUse this palette consistently: background ${req.uiKit.palette.background}, surface ${req.uiKit.palette.surface}, text ${req.uiKit.palette.text}, primary ${req.brandColor || req.uiKit.palette.primary}, secondary ${req.uiKit.palette.secondary}. Typography: ${req.uiKit.fonts.heading} headings and ${req.uiKit.fonts.body} body. Keep all generated screens within this kit's visual language. Explicit colors or dark/light direction in the user prompt override the matching kit colors.\n`
+    ? `\nSELECTED UI KIT — ${req.uiKit.name} (${req.uiKit.vibe})\n${req.uiKit.description}\n${req.uiKit.guidance}\nUse this palette consistently: background ${req.uiKit.palette.background}, surface ${req.uiKit.palette.surface}, text ${req.uiKit.palette.text}, primary ${req.brandColor || req.uiKit.palette.primary}, secondary ${req.uiKit.palette.secondary}${req.uiKit.palette.accent ? `, accent ${req.uiKit.palette.accent}` : ''}. ${req.uiKit.mode ? `The user's chosen project mode is ${req.uiKit.mode}; match it exactly unless the current prompt explicitly asks to change mode.` : ''} Typography: ${req.uiKit.fonts.heading} headings and ${req.uiKit.fonts.body} body. Keep all generated screens within this kit's visual language. Explicit colors or dark/light direction in the user prompt override the matching kit colors.\n`
     : '';
 
   if (req.selectedNodeId) {
@@ -301,7 +301,7 @@ IMAGE SLOTS: ${(briefCtx.imageSlots ?? []).map((s: any) => `${s.slug} (${s.ratio
 MOTION: level=${briefCtx.motion?.level ?? 'subtle'}; entrance=${briefCtx.motion?.entrance ?? 'fade-up stagger on lists'}; interactions=${(briefCtx.motion?.interactions ?? []).join(', ')}
 
 DEVICE: ${device} ${width}×${height}px | BRAND: ${req.brandColor || '#6C5CE7'} | STYLE: ${req.styleKeywords?.join(', ') || 'modern, clean, light'}
-COLOR SCHEME: Follow the user's prompt. Use dark mode only when dark mode, a dark theme, night mode, or a dark background is explicitly requested; otherwise use light mode. Do not infer dark mode from the app category.
+COLOR SCHEME: ${req.uiKit?.mode ? `Follow the selected project palette's ${req.uiKit.mode} mode unless this screen prompt explicitly requests the opposite mode.` : 'Follow the user prompt. Use dark mode only when dark mode, a dark theme, night mode, or a dark background is explicitly requested; otherwise use light mode. Do not infer dark mode from the app category.'}
 ${req.materialDesign3 ? 'COLOR DIRECTION: Material Design 3 enabled. Treat BRAND as the prompt-derived seed color and build a coordinated tonal palette from it.' : ''}
 
 Output ONLY the HTML for the root <div class="screen">. No markdown fences.`;
@@ -312,7 +312,7 @@ Output ONLY the HTML for the root <div class="screen">. No markdown fences.`;
 DESCRIPTION: ${req.projectDescription || ''}
 IDEA/BRIEF: ${req.projectIdea || ''}
 STYLE: ${req.styleKeywords?.join(', ') || 'Modern, clean, light'} | BRAND COLOR: ${req.brandColor || '#6C5CE7'}
-COLOR SCHEME: Follow the user's prompt. Use dark mode only when dark mode, a dark theme, night mode, or a dark background is explicitly requested; otherwise use light mode. Do not infer dark mode from the app category.
+COLOR SCHEME: ${req.uiKit?.mode ? `Follow the selected project palette's ${req.uiKit.mode} mode unless this screen prompt explicitly requests the opposite mode.` : 'Follow the user prompt. Use dark mode only when dark mode, a dark theme, night mode, or a dark background is explicitly requested; otherwise use light mode. Do not infer dark mode from the app category.'}
 TARGET: ${device}, ${width}×${height}px
 ${req.materialDesign3 ? `DESIGN SYSTEM: Material Design 3 / Material You. Use M3 color roles, tonal surfaces, accessible contrast, consistent shapes and interaction states. Derive the palette from the user request, honoring explicit color names or hex values.` : ''}
 TASK: ${req.prompt}

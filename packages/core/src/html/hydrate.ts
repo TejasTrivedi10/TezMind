@@ -226,9 +226,8 @@ export function hydrate(
 function safeImageUrl(value: string): string | null {
   try {
     if (!value) return null;
-    if (value.startsWith('data:image/')) return value;
     const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+    return url.protocol === 'https:' && !!url.hostname && !url.username && !url.password ? url.href : null;
   } catch {
     return null;
   }
@@ -238,7 +237,7 @@ function safeImageLink(value: string): string | null {
   try {
     if (!value) return null;
     const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : null;
+    return url.protocol === 'https:' && !!url.hostname && !url.username && !url.password ? url.href : null;
   } catch {
     return null;
   }

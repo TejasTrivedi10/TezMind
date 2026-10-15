@@ -17,7 +17,8 @@ class GoogleImagesScraperSettings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
     cache_ttl_seconds: int = 900
-    max_parallel_searches: int = 4
+    # Selenium's shared Chrome session is stateful, so serialize searches.
+    max_parallel_searches: int = 1
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
